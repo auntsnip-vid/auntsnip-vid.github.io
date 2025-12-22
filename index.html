@@ -1,54 +1,57 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>MyShorts</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>body{background:#000;color:#fff}</style>
+<meta charset="UTF-8">
+<title>Video Menu</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body{
+  margin:0;
+  font-family:sans-serif;
+  background:black;
+  color:white;
+}
+.menu{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
+  padding:16px;
+}
+.card{
+  background:#111;
+  border-radius:12px;
+  padding:30px 10px;
+  text-align:center;
+  font-weight:bold;
+  cursor:pointer;
+}
+.card:hover{
+  background:#222;
+}
+</style>
 </head>
+
 <body>
 
-<div class="sticky top-0 bg-black p-4 text-center border-b border-gray-800">
-  <h1 class="text-2xl font-black">MyShorts.COM</h1>
-</div>
+<h2 style="text-align:center;margin:16px 0;">Pilih Video</h2>
 
-<div class="p-2">
-  <div id="grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2"></div>
-</div>
+<div class="menu" id="menu"></div>
 
 <script>
-const items = [
-  {
-    thumb: "https://via.placeholder.com/400x700",
-    type: "image",
-    code: "a1"
-  },
-  {
-    thumb: "https://cdn.videy.co/example.mp4",
-    type: "video",
-    code: "b2"
-  }
+const menus = [
+  { title:"🔥 Viral 1", id:"a1" },
+  { title:"🔥 Viral 2", id:"a2" },
+  { title:"🔥 Viral 3", id:"a3" }
 ];
 
-const grid = document.getElementById("grid");
+const menu = document.getElementById("menu");
 
-items.forEach(i => {
-  const a = document.createElement("a");
-  a.href = "go.html?id=" + i.code;
-  a.className = "relative aspect-[9/16] overflow-hidden rounded-lg bg-gray-900";
-
-  a.innerHTML = `
-    ${i.type === "video"
-      ? `<video src="${i.thumb}" muted playsinline class="w-full h-full object-cover"></video>`
-      : `<img src="${i.thumb}" class="w-full h-full object-cover">`
-    }
-    <div class="absolute inset-0 flex items-center justify-center bg-black/40">
-      ▶
-    </div>
-  `;
-
-  grid.appendChild(a);
+menus.forEach(m=>{
+  const div = document.createElement("div");
+  div.className="card";
+  div.innerText=m.title;
+  div.onclick=()=>location.href="go.html?id="+m.id;
+  menu.appendChild(div);
 });
 </script>
 
