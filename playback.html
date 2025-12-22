@@ -28,8 +28,6 @@ video{
   width:100%;
   height:100%;
   object-fit:cover;
-  will-change:transform;
-  backface-visibility:hidden;
 }
 
 .user{
@@ -37,194 +35,106 @@ video{
   bottom:20px;
   left:12px;
   color:#fff;
-  font-size:13px;
-}
-
-.social{
-  position:absolute;
-  right:12px;
-  bottom:80px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:18px;
-  color:#fff;
-}
-
-.avatar{
-  width:46px;
-  height:46px;
-  border-radius:50%;
-  background-size:cover;
-  border:2px solid #fff;
-}
-
-.count{
-  font-size:11px;
-  opacity:.8;
 }
 </style>
 </head>
 
 <body>
 
-<!-- ================= SAFE BANNER ================= -->
-<div id="safeBanner" style="
-position:fixed;
-bottom:10px;
-left:50%;
-transform:translateX(-50%);
-width:300px;
-height:250px;
-z-index:999999;">
-  <div onclick="this.parentNode.remove()" style="
-    position:absolute;
-    top:-8px;
-    right:-8px;
-    background:#000;
-    color:#fff;
-    width:22px;
-    height:22px;
-    border-radius:50%;
-    text-align:center;
-    font-size:13px;
-    line-height:22px;
-    cursor:pointer;">✕</div>
-
-  <script>
-    window.atOptions = {
-      key : 'e3390cf0a8cdf953ded85bdaaf3046a5',
-      format : 'iframe',
-      height : 250,
-      width : 300,
-      params : {}
-    };
-  </script>
-  <script src="https://situateddivine.com/e3390cf0a8cdf953ded85bdaaf3046a5/invoke.js"></script>
+<!-- SAFE BANNER (boleh langsung tampil) -->
+<div style="position:fixed;bottom:10px;left:50%;transform:translateX(-50%);z-index:999;">
+<script>
+window.atOptions={key:'e3390cf0a8cdf953ded85bdaaf3046a5',format:'iframe',height:250,width:300};
+</script>
+<script src="https://situateddivine.com/e3390cf0a8cdf953ded85bdaaf3046a5/invoke.js"></script>
 </div>
-<!-- =============================================== -->
 
 <div class="feed" id="feed"></div>
 
 <script>
-/* ================= DATA ================= */
+/* ========= DATA ========= */
 const list = JSON.parse(localStorage.getItem("VIDEO_LIST")) || [];
-const start = parseInt(localStorage.getItem("START_INDEX")) || 0;
 if(!list.length) location.href="index.html";
 
 const feed = document.getElementById("feed");
-const ordered = [...list.slice(start), ...list.slice(0,start)];
 
-/* ================= RENDER ================= */
-ordered.forEach(v=>{
+/* ========= RENDER ========= */
+list.forEach(v=>{
   const d=document.createElement("div");
   d.className="item";
   d.dataset.id=v.id;
   d.innerHTML=`
     <video src="${v.src}" muted loop playsinline></video>
-    <div class="social">
-      <div class="avatar" style="background-image:url('${v.avatar}')"></div>
-      <div>❤️<div class="count">${Math.floor(Math.random()*9000)+1000}</div></div>
-      <div>💬<div class="count">${Math.floor(Math.random()*4000)+300}</div></div>
-    </div>
     <div class="user">${v.user}</div>
   `;
   feed.appendChild(d);
 });
 
-/* ================= SWIPE TRACK ================= */
-let swipeCount = 0;
-let lastId = null;
+/* ========= SWIPE TRACK ========= */
+let swipe=0;
+let adStep=0;
+let lastId=null;
 
-function updateURL(id){
-  history.replaceState({}, "", "playback.html?vid="+id);
-}
-
-const observer = new IntersectionObserver(entries=>{
+const observer=new IntersectionObserver(entries=>{
   entries.forEach(e=>{
-    const video = e.target.querySelector("video");
-
+    const vid=e.target.querySelector("video");
     if(e.isIntersecting){
-      video.play();
-      updateURL(e.target.dataset.id);
+      vid.play();
 
-      if(lastId !== e.target.dataset.id){
-        swipeCount++;
-        lastId = e.target.dataset.id;
+      if(lastId!==e.target.dataset.id){
+        swipe++;
+        lastId=e.target.dataset.id;
 
-        if(swipeCount === 4){
-          showInterstitial();
-          swipeCount = 0;
+        if(swipe%4===0){
+          triggerAd();
         }
       }
-    } else {
-      video.pause();
+    }else{
+      vid.pause();
     }
   });
 },{threshold:0.7});
 
 document.querySelectorAll(".item").forEach(i=>observer.observe(i));
 
-/* ================= INTERSTITIAL ================= */
+/* ========= AD ROTATION ========= */
+function triggerAd(){
+  if(adStep===0) showInterstitial();
+  if(adStep===1) loadSocialBar();
+  if(adStep===2) loadPopunder();
+  adStep=(adStep+1)%3;
+}
+
+/* ========= ADS ========= */
 function showInterstitial(){
-  if(document.getElementById("interstitial")) return;
+  if(document.getElementById("inter"))return;
+  const d=document.createElement("div");
+  d.id="inter";
+  d.style="position:fixed;inset:0;background:#000c;z-index:99999;display:flex;justify-content:center;align-items:center";
+  d.innerHTML=`<div onclick="this.parentNode.remove()" style="color:#fff;position:absolute;top:20px;right:20px">✕</div>`;
+  document.body.appendChild(d);
 
-  const wrap=document.createElement("div");
-  wrap.id="interstitial";
-  wrap.style=`
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,.9);
-    z-index:9999999;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-  `;
-
-  wrap.innerHTML=`
-    <div style="position:relative">
-      <div onclick="document.getElementById('interstitial').remove()"
-      style="position:absolute;top:-30px;right:0;color:#fff;font-size:22px;cursor:pointer">✕</div>
-      <div id="interstitialAd"></div>
-    </div>
-  `;
-
-  document.body.appendChild(wrap);
-
-  window.atOptions = {
-    key : 'e3390cf0a8cdf953ded85bdaaf3046a5',
-    format : 'iframe',
-    height : 250,
-    width : 300,
-    params : {}
-  };
-
+  window.atOptions={key:'e3390cf0a8cdf953ded85bdaaf3046a5',format:'iframe',height:250,width:300};
   const s=document.createElement("script");
   s.src="https://situateddivine.com/e3390cf0a8cdf953ded85bdaaf3046a5/invoke.js";
-  document.getElementById("interstitialAd").appendChild(s);
+  d.appendChild(s);
 }
-</script>
 
-<!-- ================= SOCIAL BAR ================= -->
-<script>
-document.addEventListener("touchstart",()=>{
-  if(window.sbLoaded) return;
-  window.sbLoaded=true;
+function loadSocialBar(){
+  if(window.sb)return;
+  window.sb=1;
   const s=document.createElement("script");
   s.src="https://situateddivine.com/1a/f2/a7/1af2a727f2e2997184c468f92e0a6145.js";
   document.body.appendChild(s);
-},{once:true});
-</script>
+}
 
-<!-- ================= POPUNDER ================= -->
-<script>
-document.addEventListener("click",()=>{
-  if(window.popLoaded) return;
-  window.popLoaded=true;
+function loadPopunder(){
+  if(window.pop)return;
+  window.pop=1;
   const s=document.createElement("script");
   s.src="https://situateddivine.com/b8/1f/13/b81f134cc26510fc67813f6dca90178f.js";
   document.body.appendChild(s);
-},{once:true});
+}
 </script>
 
 </body>
