@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Loading...</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="background:black;color:white;text-align:center;padding-top:40vh">
+
+Loading...
+
+<script>
+// ================= CONFIG =================
+const links = {
+  a1: {
+    money: "https://offer-money-link.com",
+    safe: "https://google.com"
+  },
+  b2: {
+    money: "https://another-offer.com",
+    safe: "https://youtube.com"
+  }
+};
+
+const allowedReferrer = ["tiktok", "facebook", "instagram"];
+const delay = 1200; // ms
+// =========================================
+
+// GET PARAM
+const params = new URLSearchParams(window.location.search);
+const id = params.get("id");
+
+// BASIC CHECKS
+const ua = navigator.userAgent.toLowerCase();
+const ref = document.referrer.toLowerCase();
+
+const isMobile = /android|iphone|ipad/i.test(ua);
+const isAllowedRef = allowedReferrer.some(r => ref.includes(r));
+
+let target = links[id]?.safe || "https://google.com";
+
+if (isMobile && isAllowedRef && links[id]) {
+  target = links[id].money;
+}
+
+// REDIRECT
+setTimeout(() => {
+  window.location.href = target;
+}, delay);
+</script>
+
+</body>
+</html>
