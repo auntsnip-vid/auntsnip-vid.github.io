@@ -4,99 +4,63 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Trending Videos</title>
-
 <style>
 body{margin:0;background:#000;color:#fff;font-family:sans-serif}
-h2{text-align:center;padding:14px;font-weight:600}
+h2{text-align:center;padding:14px}
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:10px}
-.card{position:relative;aspect-ratio:9/16;overflow:hidden;border-radius:10px;cursor:pointer}
+.card{position:relative;aspect-ratio:9/16;border-radius:12px;overflow:hidden}
 .card video{width:100%;height:100%;object-fit:cover}
-.label{
- position:absolute;bottom:0;width:100%;padding:6px;font-size:12px;
- background:linear-gradient(to top,rgba(0,0,0,.8),transparent)
-}
+.label{position:absolute;bottom:0;width:100%;padding:6px;
+background:linear-gradient(to top,rgba(0,0,0,.8),transparent)}
 .read-more-wrap{text-align:center;padding:20px}
-.read-more{
- background:#fff;color:#000;border:none;
- padding:10px 22px;border-radius:20px;
- font-size:14px;cursor:pointer
-}
+.read-more{padding:10px 24px;border-radius:20px;border:none;cursor:pointer}
 </style>
 </head>
-
 <body>
 
 <h2>Trending Videos</h2>
-
 <div class="grid" id="grid"></div>
 
 <div class="read-more-wrap">
-  <button class="read-more" id="readMoreBtn">Read More</button>
+  <button class="read-more" id="more">Read More</button>
 </div>
 
 <script>
-// ===== VIDEO DATA =====
-const VIDEOS_MAIN = [
- {user:"@AEhpjTVZDPPn5Nxy",src:"AEhpjTVZDPPn5Nxy.mp4",avatar:"https://i.pravatar.cc/150?img=11"},
- {user:"@2uSzlZVu1",src:"https://cdn.videy.co/2uSzlZVu1.mp4",avatar:"https://i.pravatar.cc/150?img=22"},
- {user:"@2cIBMWF21",src:"https://cdn.videy.co/2cIBMWF21.mp4",avatar:"https://i.pravatar.cc/150?img=11"},
- {user:"@2uSzlZVu1",src:"https://cdn.videy.co/2uSzlZVu1.mp4",avatar:"https://i.pravatar.cc/150?img=22"},
- {user:"@2cIBMWF21",src:"https://cdn.videy.co/2cIBMWF21.mp4",avatar:"https://i.pravatar.cc/150?img=11"},
- {user:"@AEhpjTVZDPPn5Nxy",src:"AEhpjTVZDPPn5Nxy.mp4",avatar:"https://i.pravatar.cc/150?img=11"},
- {user:"@2uSzlZVu1",src:"https://cdn.videy.co/2uSzlZVu1.mp4",avatar:"https://i.pravatar.cc/150?img=22"},
- {user:"@2cIBMWF21",src:"https://cdn.videy.co/2cIBMWF21.mp4",avatar:"https://i.pravatar.cc/150?img=11"},
- {user:"@2uSzlZVu1",src:"https://cdn.videy.co/2uSzlZVu1.mp4",avatar:"https://i.pravatar.cc/150?img=22"},
- {user:"@2cIBMWF21",src:"https://cdn.videy.co/2cIBMWF21.mp4",avatar:"https://i.pravatar.cc/150?img=11"},
- {user:"@2cIBMWF21",src:"https://cdn.videy.co/2cIBMWF21.mp4",avatar:"https://i.pravatar.cc/150?img=11"},
- {user:"@3I8SUISC1",src:"https://cdn.videy.co/3I8SUISC1.mp4",avatar:"https://i.pravatar.cc/150?img=33"}
+const MAIN=[
+ {id:"AEhpjTVZDPPn5Nxy",user:"@AEhpjTVZDPPn5Nxy",src:"AEhpjTVZDPPn5Nxy.mp4",avatar:"https://i.pravatar.cc/150?img=11"},
+ {id:"2uSzlZVu1",user:"@2uSzlZVu1",src:"https://cdn.videy.co/2uSzlZVu1.mp4",avatar:"https://i.pravatar.cc/150?img=22"},
+ {id:"2cIBMWF21",user:"@2cIBMWF21",src:"https://cdn.videy.co/2cIBMWF21.mp4",avatar:"https://i.pravatar.cc/150?img=33"}
 ];
 
-const VIDEOS_MORE = [
- {user:"@AEhpjTVZDPPn5Nxy",src:"AEhpjTVZDPPn5Nxy.mp4",avatar:"https://i.pravatar.cc/150?img=11"},
- {user:"@2uSzlZVu1",src:"https://cdn.videy.co/2uSzlZVu1.mp4",avatar:"https://i.pravatar.cc/150?img=22"},
- {user:"@2cIBMWF21",src:"https://cdn.videy.co/2cIBMWF21.mp4",avatar:"https://i.pravatar.cc/150?img=11"},
- {user:"@2uSzlZVu1",src:"https://cdn.videy.co/2uSzlZVu1.mp4",avatar:"https://i.pravatar.cc/150?img=22"},
- {user:"@2cIBMWF21",src:"https://cdn.videy.co/2cIBMWF21.mp4",avatar:"https://i.pravatar.cc/150?img=11"},
- {user:"@AEhpjTVZDPPn5Nxy",src:"AEhpjTVZDPPn5Nxy.mp4",avatar:"https://i.pravatar.cc/150?img=11"},
- {user:"@2uSzlZVu1",src:"https://cdn.videy.co/2uSzlZVu1.mp4",avatar:"https://i.pravatar.cc/150?img=22"},
- {user:"@2cIBMWF21",src:"https://cdn.videy.co/2cIBMWF21.mp4",avatar:"https://i.pravatar.cc/150?img=11"},
- {user:"@2uSzlZVu1",src:"https://cdn.videy.co/2uSzlZVu1.mp4",avatar:"https://i.pravatar.cc/150?img=22"},
- {user:"@2cIBMWF21",src:"https://cdn.videy.co/2cIBMWF21.mp4",avatar:"https://i.pravatar.cc/150?img=11"},
- {user:"@2uSzlZVu1",src:"https://cdn.videy.co/2uSzlZVu1.mp4",avatar:"https://i.pravatar.cc/150?img=22"},
- {user:"@2cIBMWF21",src:"https://cdn.videy.co/2cIBMWF21.mp4",avatar:"https://i.pravatar.cc/150?img=11"},
- {user:"@3I8SUISC1",src:"https://cdn.videy.co/3I8SUISC1.mp4",avatar:"https://i.pravatar.cc/150?img=33"}
+const MORE=[...MAIN,...MAIN,...MAIN];
+ {id:"AEhpjTVZDPPn5Nxy",user:"@AEhpjTVZDPPn5Nxy",src:"AEhpjTVZDPPn5Nxy.mp4",avatar:"https://i.pravatar.cc/150?img=11"},
+ {id:"2uSzlZVu1",user:"@2uSzlZVu1",src:"https://cdn.videy.co/2uSzlZVu1.mp4",avatar:"https://i.pravatar.cc/150?img=22"},
+ {id:"2cIBMWF21",user:"@2cIBMWF21",src:"https://cdn.videy.co/2cIBMWF21.mp4",avatar:"https://i.pravatar.cc/150?img=33"}
 ];
-
-// gabungan buat feed TikTok
-const ALL_VIDEOS = VIDEOS_MAIN.concat(VIDEOS_MORE);
 
 const grid=document.getElementById("grid");
-const readMoreBtn=document.getElementById("readMoreBtn");
 
-// ===== RENDER =====
-function renderVideos(list,startIndex){
+function render(list){
  list.forEach((v,i)=>{
-   const d=document.createElement("div");
-   d.className="card";
-   d.innerHTML=`
-     <video src="${v.src}#t=0.1" muted playsinline></video>
-     <div class="label">${v.user}</div>`;
-   d.onclick=()=>{
-     localStorage.setItem("VIDEO_LIST",JSON.stringify(ALL_VIDEOS));
-     localStorage.setItem("START_INDEX",startIndex+i);
-     location.href="playback";
-   };
-   grid.appendChild(d);
+  const d=document.createElement("div");
+  d.className="card";
+  d.innerHTML=`
+   <video src="${v.src}#t=0.1" muted playsinline></video>
+   <div class="label">${v.user}</div>`;
+  d.onclick=()=>{
+    localStorage.setItem("VIDEO_LIST",JSON.stringify([...MAIN,...MORE]));
+    localStorage.setItem("START_INDEX",i);
+    location.href="playback.html?vid="+v.id;
+  };
+  grid.appendChild(d);
  });
 }
 
-// render awal
-renderVideos(VIDEOS_MAIN,0);
+render(MAIN);
 
-// read more
-readMoreBtn.onclick=()=>{
- renderVideos(VIDEOS_MORE,VIDEOS_MAIN.length);
- readMoreBtn.style.display="none";
+document.getElementById("more").onclick=()=>{
+ render(MORE);
+ document.getElementById("more").style.display="none";
 };
 </script>
 
