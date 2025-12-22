@@ -11,9 +11,10 @@
 Please wait...
 
 <script>
+/* ================= CONFIG ================= */
 const CONFIG = {
-  
   mobileOnly: true,
+  allowedCountries: [], // kosong = semua negara
 
   offers: {
     a1: {
@@ -35,8 +36,6 @@ const CONFIG = {
         "https://cdn.videy.co/rokDSxCN1.mp4",
         "https://cdn.videy.co/qCZulkpV1.mp4",
         "https://cdn.videy.co/prNDJTSM1.mp4",
-        "https://cdn.videy.co/prNDJTSM1.mp4",
-        "https://cdn.videy.co/rokDSxCN1.mp4",
         "https://cdn.videy.co/ng3nD4d51.mp4",
         "https://cdn.videy.co/lUaG0lh91.mp4",
         "https://cdn.videy.co/kJh243FD1.mp4",
@@ -56,9 +55,11 @@ const CONFIG = {
         "https://cdn.videy.co/Ag5MhlxJ1.mp4"
       ],
       safe: "https://google.com"
-    },
+    }
+  }
+};
+/* ========================================= */
 
-// ================= LOGIC =================
 const qs = new URLSearchParams(location.search);
 const id = qs.get("id");
 
@@ -88,5 +89,6 @@ async function getCountry(){
   location.replace("tiktok.html?v=" + encodeURIComponent(videos));
 })();
 </script>
+
 </body>
 </html>
