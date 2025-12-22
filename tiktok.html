@@ -5,71 +5,120 @@
 <title>Videos</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <style>
-html,body{
-  margin:0;
-  height:100%;
-  background:black;
-  overflow:hidden;
+html,body{margin:0;height:100%;background:black;overflow:hidden;font-family:sans-serif}
+.feed{height:100%;overflow-y:auto;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch}
+.item{position:relative;height:100vh;scroll-snap-align:start}
+video{width:100%;height:100%;object-fit:cover}
+
+/* RIGHT UI */
+.ui{
+  position:absolute;right:10px;bottom:80px;
+  display:flex;flex-direction:column;align-items:center;gap:16px;color:#fff
 }
-.feed{
-  height:100%;
-  overflow-y:auto;
-  scroll-snap-type:y mandatory;
-  -webkit-overflow-scrolling:touch;
+.avatar{
+  width:46px;height:46px;border-radius:50%;border:2px solid #fff;
+  background-size:cover;background-position:center
 }
-.item{
-  height:100vh;
-  scroll-snap-align:start;
+.btn{font-size:12px;text-align:center;opacity:.95}
+.btn span{display:block;margin-top:4px}
+
+/* CONTROLS */
+.controls{
+  position:absolute;left:12px;bottom:20px;display:flex;gap:10px
 }
-video{
-  width:100%;
-  height:100%;
-  object-fit:cover;
+.ctrl{
+  background:rgba(0,0,0,.55);color:#fff;border-radius:999px;
+  padding:8px 12px;font-size:12px
 }
 </style>
 </head>
 
 <body>
-
 <div class="feed" id="feed"></div>
 
 <script>
-const qs = new URLSearchParams(location.search);
-const raw = qs.get("v");
-if(!raw) location.href="https://auntsnip-vid.github.io";
+/* ===== helpers ===== */
+const rand=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const users=["@nina_","@jordanx","@alexv","@mika","@luna","@dion","@kay","@rio","@sasha"];
+const avatars=[1,2,3,4,5,6,7,8,9].map(i=>`https://i.pravatar.cc/150?img=${i}`);
 
-const list = decodeURIComponent(raw).split("|");
-const feed = document.getElementById("feed");
+/* ===== get list ===== */
+const qs=new URLSearchParams(location.search);
+const raw=qs.get("v");
+if(!raw) location.href="/";
+const list=decodeURIComponent(raw).split("|");
 
-// Render video list
+const feed=document.getElementById("feed");
+
+/* ===== render ===== */
 list.forEach(src=>{
-  const item=document.createElement("div");
-  item.className="item";
-  item.innerHTML=`<video src="${src}" muted playsinline preload="auto"></video>`;
-  feed.appendChild(item);
+  const like=rand(1_200,98_000);
+  const cmt=rand(50,4_900);
+  const user=pick(users);
+  const ava=pick(avatars);
+
+  const d=document.createElement("div");
+  d.className="item";
+  d.innerHTML=`
+    <video src="${src}" muted playsinline preload="auto"></video>
+
+    <div class="ui">
+      <div class="avatar" style="background-image:url('${ava}')"></div>
+      <div class="btn">❤️<span>${like.toLocaleString()}</span></div>
+      <div class="btn">💬<span>${cmt.toLocaleString()}</span></div>
+      <div class="btn">↗️<span>Share</span></div>
+      <div style="font-size:11px;opacity:.8">${user}</div>
+    </div>
+
+    <div class="controls">
+      <div class="ctrl pause">⏸ Pause</div>
+      <div class="ctrl speed">⏩ 1x</div>
+    </div>
+  `;
+  feed.appendChild(d);
 });
 
+/* ===== playback logic ===== */
 const videos=[...document.querySelectorAll("video")];
+let current=null;
 
-// Intersection Observer (smooth)
 const observer=new IntersectionObserver(entries=>{
-  entries.forEach(entry=>{
-    const v=entry.target;
-    if(entry.isIntersecting){
-      v.play().catch(()=>{});
+  entries.forEach(e=>{
+    const v=e.target;
+    if(e.isIntersecting){
+      current=v; v.play().catch(()=>{});
     }else{
       v.pause();
     }
   });
-},{ threshold:0.6 });
+},{threshold:.6});
 
 videos.forEach(v=>observer.observe(v));
 
-// Tap anywhere to unmute
+/* unmute on first tap */
 document.body.addEventListener("click",()=>{
   videos.forEach(v=>v.muted=false);
-},{ once:true });
-</script>
+},{once:true});
 
+/* pause / speed buttons */
+document.querySelectorAll(".item").forEach(item=>{
+  const v=item.querySelector("video");
+  const p=item.querySelector(".pause");
+  const s=item.querySelector(".speed");
+  let sp=1;
+
+  p.onclick=()=>{
+    if(v.paused){v.play();p.textContent="⏸ Pause";}
+    else{v.pause();p.textContent="▶️ Play";}
+  };
+
+  s.onclick=()=>{
+    sp = sp===1 ? 1.5 : sp===1.5 ? 2 : 1;
+    v.playbackRate=sp;
+    s.textContent=`⏩ ${sp}x`;
+  };
+});
+</script>
 </body>
 </html>
