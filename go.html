@@ -10,21 +10,18 @@
 Please wait...
 
 <script>
-const qs=new URLSearchParams(location.search);
-const video=qs.get("video");
-const title=qs.get("title");
-const avatar=qs.get("avatar");
+const qs = new URLSearchParams(location.search);
+const video = qs.get("video");
+const title = qs.get("title");
+const avatar = qs.get("avatar");
 
-if(!video||!title||!avatar){
-  location.href="index.html";
+if(!video || !title){
+  location.href = "index.html";
 }else{
-  const payload = [{
-    src: video,
-    user: title,
-    avatar: avatar
-  }];
   location.replace(
-    "tiktok.html?data="+encodeURIComponent(JSON.stringify(payload))
+    "tiktok.html?video="+encodeURIComponent(video)+
+    "&title="+encodeURIComponent(title)+
+    "&avatar="+encodeURIComponent(avatar || video)
   );
 }
 </script>
