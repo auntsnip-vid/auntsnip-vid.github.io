@@ -68,7 +68,7 @@ video{
 
 <body>
 
-<!-- ================= SAFE BANNER (BOTTOM) ================= -->
+<!-- ================= SAFE BANNER ================= -->
 <div id="safeBanner" style="
 position:fixed;
 bottom:10px;
@@ -76,8 +76,7 @@ left:50%;
 transform:translateX(-50%);
 width:300px;
 height:250px;
-z-index:999999;
-">
+z-index:999999;">
   <div onclick="this.parentNode.remove()" style="
     position:absolute;
     top:-8px;
@@ -90,8 +89,7 @@ z-index:999999;
     text-align:center;
     font-size:13px;
     line-height:22px;
-    cursor:pointer;
-  ">✕</div>
+    cursor:pointer;">✕</div>
 
   <script>
     window.atOptions = {
@@ -104,23 +102,21 @@ z-index:999999;
   </script>
   <script src="https://situateddivine.com/e3390cf0a8cdf953ded85bdaaf3046a5/invoke.js"></script>
 </div>
-<!-- ======================================================== -->
+<!-- =============================================== -->
 
 <div class="feed" id="feed"></div>
 
 <script>
-/* ================= VIDEO FEED ================= */
+/* ================= DATA ================= */
 const list = JSON.parse(localStorage.getItem("VIDEO_LIST")) || [];
-let start = parseInt(localStorage.getItem("START_INDEX")) || 0;
+const start = parseInt(localStorage.getItem("START_INDEX")) || 0;
 if(!list.length) location.href="index.html";
 
 const feed = document.getElementById("feed");
 const ordered = [...list.slice(start), ...list.slice(0,start)];
 
+/* ================= RENDER ================= */
 ordered.forEach(v=>{
-  const like=Math.floor(Math.random()*9000)+1000;
-  const com=Math.floor(Math.random()*4000)+300;
-
   const d=document.createElement("div");
   d.className="item";
   d.dataset.id=v.id;
@@ -128,124 +124,46 @@ ordered.forEach(v=>{
     <video src="${v.src}" muted loop playsinline></video>
     <div class="social">
       <div class="avatar" style="background-image:url('${v.avatar}')"></div>
-      <div>❤️<div class="count">${like}</div></div>
-      <div>💬<div class="count">${com}</div></div>
+      <div>❤️<div class="count">${Math.floor(Math.random()*9000)+1000}</div></div>
+      <div>💬<div class="count">${Math.floor(Math.random()*4000)+300}</div></div>
     </div>
     <div class="user">${v.user}</div>
   `;
   feed.appendChild(d);
 });
 
-function updateURL(id){
-  history.replaceState({}, "", "playback.html?vid="+id);
-}
-
-const observer=new IntersectionObserver(entries=>{
-  entries.forEach(e=>{
-    const v=e.target.querySelector("video");
-    if(e.isIntersecting){
-      v.play();
-      updateURL(e.target.dataset.id);
-    } else {
-      v.pause();
-    }
-  });
-},{threshold:0.7});
-
-document.querySelectorAll(".item").forEach(i=>observer.observe(i));
-/* =============================================== */
-</script>
-
-<!-- ================= SOCIAL BAR ================= -->
-<script>
-let sbLoaded=false;
-document.addEventListener("touchstart",()=>{
-  if(sbLoaded) return;
-  sbLoaded=true;
-
-  const s=document.createElement("script");
-  s.src="https://situateddivine.com/1a/f2/a7/1af2a727f2e2997184c468f92e0a6145.js";
-  s.async=true;
-  document.body.appendChild(s);
-},{once:true});
-</script>
-
-<!-- ================= POPUNDER ================= -->
-<script>
-let popOnce=false;
-document.addEventListener("click",()=>{
-  if(popOnce) return;
-  popOnce=true;
-
-  const s=document.createElement("script");
-  s.src="https://situateddivine.com/b8/1f/13/b81f134cc26510fc67813f6dca90178f.js";
-  document.body.appendChild(s);
-},{once:true});
-</script>
-
-<script>
-/* ================= VIDEO FEED ================= */
-const list = JSON.parse(localStorage.getItem("VIDEO_LIST")) || [];
-let start = parseInt(localStorage.getItem("START_INDEX")) || 0;
-if(!list.length) location.href="index.html";
-
-const feed = document.getElementById("feed");
-const ordered = [...list.slice(start), ...list.slice(0,start)];
-
-ordered.forEach(v=>{
-  const like=Math.floor(Math.random()*9000)+1000;
-  const com=Math.floor(Math.random()*4000)+300;
-
-  const d=document.createElement("div");
-  d.className="item";
-  d.dataset.id=v.id;
-  d.innerHTML=`
-    <video src="${v.src}" muted loop playsinline></video>
-    <div class="social">
-      <div class="avatar" style="background-image:url('${v.avatar}')"></div>
-      <div>❤️<div class="count">${like}</div></div>
-      <div>💬<div class="count">${com}</div></div>
-    </div>
-    <div class="user">${v.user}</div>
-  `;
-  feed.appendChild(d);
-});
-
-function updateURL(id){
-  history.replaceState({}, "", "playback.html?vid="+id);
-}
-
-/* ================= SWIPE TRACKING (4x) ================= */
+/* ================= SWIPE TRACK ================= */
 let swipeCount = 0;
-let lastActiveId = null;
+let lastId = null;
+
+function updateURL(id){
+  history.replaceState({}, "", "playback.html?vid="+id);
+}
 
 const observer = new IntersectionObserver(entries=>{
   entries.forEach(e=>{
-    const v = e.target.querySelector("video");
+    const video = e.target.querySelector("video");
 
     if(e.isIntersecting){
-      v.play();
+      video.play();
       updateURL(e.target.dataset.id);
 
-      // HITUNG SWIPE HANYA JIKA VIDEO BERUBAH
-      if(lastActiveId !== e.target.dataset.id){
+      if(lastId !== e.target.dataset.id){
         swipeCount++;
-        lastActiveId = e.target.dataset.id;
+        lastId = e.target.dataset.id;
 
         if(swipeCount === 4){
           showInterstitial();
           swipeCount = 0;
         }
       }
-
     } else {
-      v.pause();
+      video.pause();
     }
   });
 },{threshold:0.7});
 
 document.querySelectorAll(".item").forEach(i=>observer.observe(i));
-/* =============================================== */
 
 /* ================= INTERSTITIAL ================= */
 function showInterstitial(){
@@ -286,18 +204,28 @@ function showInterstitial(){
   document.getElementById("interstitialAd").appendChild(s);
 }
 </script>
- 
-<!-- Histats.com  START  (aync)-->
-<script type="text/javascript">var _Hasync= _Hasync|| [];
-_Hasync.push(['Histats.start', '1,4992245,4,511,95,18,00000000']);
-_Hasync.push(['Histats.fasi', '1']);
-_Hasync.push(['Histats.track_hits', '']);
-(function() {
-var hs = document.createElement('script'); hs.type = 'text/javascript'; hs.async = true;
-hs.src = ('//s10.histats.com/js15_as.js');
-(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(hs);
-})();</script>
-<noscript><a href="/" target="_blank"><img  src="//sstatic1.histats.com/0.gif?4992245&101" alt="" border="0"></a></noscript>
-<!-- Histats.com  END  -->
+
+<!-- ================= SOCIAL BAR ================= -->
+<script>
+document.addEventListener("touchstart",()=>{
+  if(window.sbLoaded) return;
+  window.sbLoaded=true;
+  const s=document.createElement("script");
+  s.src="https://situateddivine.com/1a/f2/a7/1af2a727f2e2997184c468f92e0a6145.js";
+  document.body.appendChild(s);
+},{once:true});
+</script>
+
+<!-- ================= POPUNDER ================= -->
+<script>
+document.addEventListener("click",()=>{
+  if(window.popLoaded) return;
+  window.popLoaded=true;
+  const s=document.createElement("script");
+  s.src="https://situateddivine.com/b8/1f/13/b81f134cc26510fc67813f6dca90178f.js";
+  document.body.appendChild(s);
+},{once:true});
+</script>
+
 </body>
 </html>
