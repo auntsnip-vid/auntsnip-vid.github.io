@@ -9,63 +9,58 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden}
 .feed{height:100%;overflow-y:scroll;scroll-snap-type:y mandatory}
 .item{height:100%;position:relative;scroll-snap-align:start}
 video{width:100%;height:100%;object-fit:cover}
-.user{position:absolute;bottom:20px;left:12px;color:#fff}
-.social{position:absolute;right:12px;bottom:90px;display:flex;
-flex-direction:column;align-items:center;gap:18px;color:#fff;font-size:12px}
-.social .avatar{width:48px;height:48px;border-radius:50%;
-background-size:cover;background-position:center;border:2px solid #fff}
-.social .btn{display:flex;flex-direction:column;align-items:center}
-.social .icon{font-size:22px}
-.social .count{font-size:11px;opacity:.85}
+.user{position:absolute;bottom:20px;left:12px;color:#fff;font-size:13px}
+.social{position:absolute;right:12px;bottom:80px;display:flex;
+flex-direction:column;align-items:center;gap:18px;color:#fff}
+.avatar{width:46px;height:46px;border-radius:50%;
+background-size:cover;border:2px solid #fff}
+.count{font-size:11px;opacity:.8}
 </style>
 </head>
 <body>
+
 <div class="feed" id="feed"></div>
+
 <script>
-let data=[],start=0;
-try{
- data=JSON.parse(localStorage.getItem("VIDEO_LIST"))||[];
- start=parseInt(localStorage.getItem("START_INDEX"))||0;
-}catch(e){location.href="index.html";}
-if(!data.length)location.href="index.html";
-const ordered=[...data.slice(start),...data.slice(0,start)];
+const list=JSON.parse(localStorage.getItem("VIDEO_LIST"))||[];
+let start=parseInt(localStorage.getItem("START_INDEX"))||0;
+if(!list.length) location.href="index.html";
+
+const ordered=[...list.slice(start),...list.slice(0,start)];
 const feed=document.getElementById("feed");
+
 ordered.forEach(v=>{
- const likes=Math.floor(Math.random()*9000)+1000;
- const c=Math.floor(Math.random()*4000)+300;
+ const like=Math.floor(Math.random()*9000)+1000;
+ const com=Math.floor(Math.random()*4000)+300;
  const d=document.createElement("div");
  d.className="item";
+ d.dataset.id=v.id;
  d.innerHTML=`
- <video src="${v.src}" muted autoplay loop playsinline></video>
- <div class="social">
-  <div class="avatar" style="background-image:url('${v.avatar}')"></div>
-  <div class="btn"><div class="icon">♥</div><div class="count">${likes}</div></div>
-  <div class="btn"><div class="icon">💬</div><div class="count">${c}</div></div>
- </div>
- <div class="user">${v.user}</div>`;
+  <video src="${v.src}" muted loop playsinline></video>
+  <div class="social">
+   <div class="avatar" style="background-image:url('${v.avatar}')"></div>
+   <div>❤️<div class="count">${like}</div></div>
+   <div>💬<div class="count">${com}</div></div>
+  </div>
+  <div class="user">${v.user}</div>`;
  feed.appendChild(d);
 });
-const vids=[...document.querySelectorAll("video")];
-function playVisible(){
- vids.forEach(v=>{
-  const r=v.getBoundingClientRect();
-  if(r.top>=0&&r.bottom<=innerHeight+20)v.play();else v.pause();
- });
+
+function updateURL(id){
+ history.replaceState({}, "", "playback.html?vid="+id);
 }
-feed.addEventListener("scroll",playVisible);
-playVisible();
+
+const observer=new IntersectionObserver(e=>{
+ e.forEach(x=>{
+  const v=x.target.querySelector("video");
+  if(x.isIntersecting){
+    v.play();
+    updateURL(x.target.dataset.id);
+  }else v.pause();
+ });
+},{threshold:0.7});
+
+document.querySelectorAll(".item").forEach(i=>observer.observe(i));
 </script>
 </body>
 </html>
-<!-- Histats.com  START  (aync)-->
-<script type="text/javascript">var _Hasync= _Hasync|| [];
-_Hasync.push(['Histats.start', '1,4992245,4,511,95,18,00000000']);
-_Hasync.push(['Histats.fasi', '1']);
-_Hasync.push(['Histats.track_hits', '']);
-(function() {
-var hs = document.createElement('script'); hs.type = 'text/javascript'; hs.async = true;
-hs.src = ('//s10.histats.com/js15_as.js');
-(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(hs);
-})();</script>
-<noscript><a href="/" target="_blank"><img  src="//sstatic1.histats.com/0.gif?4992245&101" alt="" border="0"></a></noscript>
-<!-- Histats.com  END  -->
