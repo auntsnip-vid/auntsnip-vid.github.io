@@ -1,68 +1,40 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Pilih Video</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 body{margin:0;background:#000;color:#fff;font-family:sans-serif}
-h2{text-align:center;padding:14px 0}
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
-  gap:10px;padding:10px
-}
-.card{
-  position:relative;aspect-ratio:9/16;
-  background:#111;border-radius:10px;
-  overflow:hidden;cursor:pointer
-}
+h2{text-align:center;padding:12px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:10px}
+.card{position:relative;aspect-ratio:9/16;overflow:hidden;border-radius:10px;cursor:pointer}
 .card video{width:100%;height:100%;object-fit:cover}
-.label{
-  position:absolute;bottom:0;width:100%;
-  background:linear-gradient(to top,rgba(0,0,0,.8),transparent);
-  padding:6px;font-size:12px
-}
+.label{position:absolute;bottom:0;width:100%;padding:6px;font-size:12px;
+background:linear-gradient(to top,rgba(0,0,0,.8),transparent)}
 </style>
 </head>
-
 <body>
 <h2>Pilih Video</h2>
 <div class="grid" id="grid"></div>
-
 <script>
-const menus = [
-  {
-    title:"@2cIBMWF21",
-    video:"https://cdn.videy.co/2cIBMWF21.mp4"
-  },
-  {
-    title:"@2uSzlZVu1",
-    video:"https://cdn.videy.co/2uSzlZVu1.mp4"
-  },
-  {
-    title:"@3I8SUISC1",
-    video:"https://cdn.videy.co/3I8SUISC1.mp4"
-  }
-  // 👉 tambah terus bebas
+const VIDEOS=[
+ {user:"@2cIBMWF21",src:"https://cdn.videy.co/2cIBMWF21.mp4",avatar:"https://i.pravatar.cc/150?img=11"},
+ {user:"@2uSzlZVu1",src:"https://cdn.videy.co/2uSzlZVu1.mp4",avatar:"https://i.pravatar.cc/150?img=22"},
+ {user:"@3I8SUISC1",src:"https://cdn.videy.co/3I8SUISC1.mp4",avatar:"https://i.pravatar.cc/150?img=33"}
 ];
-
 const grid=document.getElementById("grid");
-
-menus.forEach(m=>{
-  const d=document.createElement("div");
-  d.className="card";
-  d.innerHTML=`
-    <video src="${m.video}#t=0.1" muted playsinline></video>
-    <div class="label">${m.title}</div>
-  `;
-  d.onclick=()=>{
-    location.href =
-      "go.html?video="+encodeURIComponent(m.video)+
-      "&title="+encodeURIComponent(m.title)+
-      "&avatar="+encodeURIComponent(m.video);
-  };
-  grid.appendChild(d);
+VIDEOS.forEach((v,i)=>{
+ const d=document.createElement("div");
+ d.className="card";
+ d.innerHTML=`<video src="${v.src}#t=0.1" muted playsinline></video>
+ <div class="label">${v.user}</div>`;
+ d.onclick=()=>{
+   localStorage.setItem("VIDEO_LIST",JSON.stringify(VIDEOS));
+   localStorage.setItem("START_INDEX",i);
+   location.href="tiktok.html";
+ };
+ grid.appendChild(d);
 });
 </script>
 </body>

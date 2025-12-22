@@ -1,169 +1,59 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<title>Watch</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Feed</title>
 <style>
-html,body{
-  margin:0;height:100%;background:#000;overflow:hidden;
-  font-family:-apple-system,BlinkMacSystemFont,sans-serif
-}
-#feed{
-  height:100vh;
-  overflow-y:scroll;
-  scroll-snap-type:y mandatory;
-}
-.item{
-  position:relative;
-  height:100vh;
-  scroll-snap-align:start;
-}
-video{
-  position:absolute;inset:0;
-  width:100%;height:100%;
-  object-fit:cover;
-}
-.ui{position:absolute;inset:0;color:#fff;z-index:5}
-.right{
-  position:absolute;right:12px;bottom:100px;
-  display:flex;flex-direction:column;
-  align-items:center;gap:16px
-}
-.avatar{
-  width:52px;height:52px;border-radius:50%;
-  border:2px solid #fff;
-  background-size:cover;background-position:center
-}
-.count{font-size:12px}
-.left{
-  position:absolute;left:12px;bottom:20px;
-  font-size:13px
-}
-.progress{
-  position:absolute;left:0;right:0;bottom:0;
-  height:3px;background:rgba(255,255,255,.2)
-}
-.bar{
-  height:100%;width:0;background:#fff
-}
-.heart{
-  position:absolute;
-  font-size:80px;
-  color:#ff2d55;
-  opacity:0;
-  transform:translate(-50%,-50%) scale(.6);
-  animation:pop .8s forwards;
-}
-@keyframes pop{
-  0%{opacity:0;transform:translate(-50%,-50%) scale(.6)}
-  30%{opacity:1;transform:translate(-50%,-50%) scale(1.2)}
-  100%{opacity:0;transform:translate(-50%,-50%) scale(1)}
-}
+html,body{margin:0;height:100%;background:#000;overflow:hidden}
+.feed{height:100%;overflow-y:scroll;scroll-snap-type:y mandatory}
+.item{height:100%;position:relative;scroll-snap-align:start}
+video{width:100%;height:100%;object-fit:cover}
+.user{position:absolute;bottom:20px;left:12px;color:#fff}
+.social{position:absolute;right:12px;bottom:90px;display:flex;
+flex-direction:column;align-items:center;gap:18px;color:#fff;font-size:12px}
+.social .avatar{width:48px;height:48px;border-radius:50%;
+background-size:cover;background-position:center;border:2px solid #fff}
+.social .btn{display:flex;flex-direction:column;align-items:center}
+.social .icon{font-size:22px}
+.social .count{font-size:11px;opacity:.85}
 </style>
 </head>
-
 <body>
-
-<div id="feed"></div>
-
+<div class="feed" id="feed"></div>
 <script>
-/* ================= DATA ================= */
-const qs = new URLSearchParams(location.search);
-const firstVideo = qs.get("video");
-const firstUser  = qs.get("title");
-const firstAvatar= qs.get("avatar") || firstVideo;
-
-if(!firstVideo) location.href="index.html";
-
-// 🔥 LIST VIDEO (AUTO INFINITE)
-const VIDEOS = [
-  firstVideo,
-  "https://cdn.videy.co/2uSzlZVu1.mp4",
-  "https://cdn.videy.co/3I8SUISC1.mp4",
-  "https://cdn.videy.co/8h6NHkWX1.mp4",
-  "https://cdn.videy.co/Ns3BquFg1.mp4",
-  "https://cdn.videy.co/PfA4QMSU1.mp4"
-];
-
-const USERS = VIDEOS.map((v,i)=>({
-  user: i===0 ? firstUser : "@viral_"+(i+1),
-  avatar: i===0 ? firstAvatar : v
-}));
-
-/* ================= FEED ================= */
-const feed = document.getElementById("feed");
-
-function addItem(i){
-  const d = document.createElement("div");
-  d.className="item";
-  d.innerHTML=`
-    <video src="${VIDEOS[i%VIDEOS.length]}" playsinline muted loop></video>
-
-    <div class="ui">
-      <div class="right">
-        <div class="avatar" style="background-image:url('${USERS[i%USERS.length].avatar}')"></div>
-        ❤️ <div class="count">${rnd(1000,90000)}</div>
-        💬 <div class="count">${rnd(50,5000)}</div>
-      </div>
-
-      <div class="left">
-        <b>${USERS[i%USERS.length].user}</b><br>
-        Swipe up for more
-      </div>
-
-      <div class="progress"><div class="bar"></div></div>
-    </div>
-  `;
-  feed.appendChild(d);
-
-  const v=d.querySelector("video");
-  const bar=d.querySelector(".bar");
-
-  v.ontimeupdate=()=>{
-    bar.style.width=(v.currentTime/v.duration*100)+"%";
-  };
-
-  // autoplay when visible
-  new IntersectionObserver(e=>{
-    if(e[0].isIntersecting){
-      v.play();
-    }else{
-      v.pause();
-    }
-  },{threshold:.7}).observe(d);
-
-  // double tap like
-  let last=0;
-  d.addEventListener("click",e=>{
-    const now=Date.now();
-    if(now-last<300){
-      const h=document.createElement("div");
-      h.className="heart";
-      h.textContent="❤️";
-      h.style.left=e.clientX+"px";
-      h.style.top=e.clientY+"px";
-      d.appendChild(h);
-      setTimeout(()=>h.remove(),800);
-    }
-    last=now;
-    v.muted=false;
-  });
-}
-
-// initial items
-for(let i=0;i<4;i++) addItem(i);
-
-// infinite
-feed.addEventListener("scroll",()=>{
-  if(feed.scrollTop+innerHeight>=feed.scrollHeight-300){
-    const n=feed.children.length;
-    addItem(n);
-  }
+let data=[],start=0;
+try{
+ data=JSON.parse(localStorage.getItem("VIDEO_LIST"))||[];
+ start=parseInt(localStorage.getItem("START_INDEX"))||0;
+}catch(e){location.href="index.html";}
+if(!data.length)location.href="index.html";
+const ordered=[...data.slice(start),...data.slice(0,start)];
+const feed=document.getElementById("feed");
+ordered.forEach(v=>{
+ const likes=Math.floor(Math.random()*9000)+1000;
+ const c=Math.floor(Math.random()*4000)+300;
+ const d=document.createElement("div");
+ d.className="item";
+ d.innerHTML=`
+ <video src="${v.src}" muted autoplay loop playsinline></video>
+ <div class="social">
+  <div class="avatar" style="background-image:url('${v.avatar}')"></div>
+  <div class="btn"><div class="icon">♥</div><div class="count">${likes}</div></div>
+  <div class="btn"><div class="icon">💬</div><div class="count">${c}</div></div>
+ </div>
+ <div class="user">${v.user}</div>`;
+ feed.appendChild(d);
 });
-
-function rnd(a,b){return (Math.random()*(b-a)+a|0).toLocaleString()}
+const vids=[...document.querySelectorAll("video")];
+function playVisible(){
+ vids.forEach(v=>{
+  const r=v.getBoundingClientRect();
+  if(r.top>=0&&r.bottom<=innerHeight+20)v.play();else v.pause();
+ });
+}
+feed.addEventListener("scroll",playVisible);
+playVisible();
 </script>
-
 </body>
 </html>
