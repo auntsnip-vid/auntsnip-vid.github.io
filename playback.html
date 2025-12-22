@@ -183,18 +183,71 @@ document.addEventListener("click",()=>{
 },{once:true});
 </script>
 
-<!-- ============ INTERSTITIAL (3 SWIPE) ============ -->
 <script>
-let swipeCount=0;
+/* ================= VIDEO FEED ================= */
+const list = JSON.parse(localStorage.getItem("VIDEO_LIST")) || [];
+let start = parseInt(localStorage.getItem("START_INDEX")) || 0;
+if(!list.length) location.href="index.html";
 
-feed.addEventListener("scroll",()=>{
-  swipeCount++;
-  if(swipeCount===3){
-    showInterstitial();
-    swipeCount=0;
-  }
+const feed = document.getElementById("feed");
+const ordered = [...list.slice(start), ...list.slice(0,start)];
+
+ordered.forEach(v=>{
+  const like=Math.floor(Math.random()*9000)+1000;
+  const com=Math.floor(Math.random()*4000)+300;
+
+  const d=document.createElement("div");
+  d.className="item";
+  d.dataset.id=v.id;
+  d.innerHTML=`
+    <video src="${v.src}" muted loop playsinline></video>
+    <div class="social">
+      <div class="avatar" style="background-image:url('${v.avatar}')"></div>
+      <div>❤️<div class="count">${like}</div></div>
+      <div>💬<div class="count">${com}</div></div>
+    </div>
+    <div class="user">${v.user}</div>
+  `;
+  feed.appendChild(d);
 });
 
+function updateURL(id){
+  history.replaceState({}, "", "playback.html?vid="+id);
+}
+
+/* ================= SWIPE TRACKING (4x) ================= */
+let swipeCount = 0;
+let lastActiveId = null;
+
+const observer = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    const v = e.target.querySelector("video");
+
+    if(e.isIntersecting){
+      v.play();
+      updateURL(e.target.dataset.id);
+
+      // HITUNG SWIPE HANYA JIKA VIDEO BERUBAH
+      if(lastActiveId !== e.target.dataset.id){
+        swipeCount++;
+        lastActiveId = e.target.dataset.id;
+
+        if(swipeCount === 4){
+          showInterstitial();
+          swipeCount = 0;
+        }
+      }
+
+    } else {
+      v.pause();
+    }
+  });
+},{threshold:0.7});
+
+document.querySelectorAll(".item").forEach(i=>observer.observe(i));
+/* =============================================== */
+
+/* ================= INTERSTITIAL ================= */
 function showInterstitial(){
   if(document.getElementById("interstitial")) return;
 
