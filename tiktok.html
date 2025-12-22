@@ -5,45 +5,115 @@
 <title>Videos</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <style>
-html,body{margin:0;height:100%;background:black;overflow:hidden;font-family:sans-serif}
-.feed{height:100%;overflow-y:auto;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch}
-.item{position:relative;height:100vh;scroll-snap-align:start}
-video{width:100%;height:100%;object-fit:cover}
+html,body{
+  margin:0;height:100%;
+  background:#000;
+  overflow:hidden;
+  font-family:sans-serif;
+}
 
-/* RIGHT UI */
-.ui{
-  position:absolute;right:10px;bottom:80px;
-  display:flex;flex-direction:column;align-items:center;gap:16px;color:#fff
+/* FEED */
+.feed{
+  height:100%;
+  overflow-y:auto;
+  scroll-snap-type:y mandatory;
+  -webkit-overflow-scrolling:touch;
+}
+.item{
+  position:relative;
+  height:100vh;
+  scroll-snap-align:start;
+}
+
+/* VIDEO */
+video{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  z-index:1;
+}
+
+/* OVERLAY */
+.overlay{
+  position:absolute;
+  inset:0;
+  z-index:5;
+  pointer-events:none;
+}
+
+/* RIGHT MENU */
+.right{
+  position:absolute;
+  right:10px;
+  bottom:90px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:18px;
+  color:#fff;
+  pointer-events:auto;
 }
 .avatar{
-  width:46px;height:46px;border-radius:50%;border:2px solid #fff;
-  background-size:cover;background-position:center
+  width:48px;height:48px;
+  border-radius:50%;
+  border:2px solid #fff;
+  background-size:cover;
+  background-position:center;
 }
-.btn{font-size:12px;text-align:center;opacity:.95}
-.btn span{display:block;margin-top:4px}
+.icon{
+  font-size:13px;
+  text-align:center;
+}
+.icon span{
+  display:block;
+  font-size:11px;
+  margin-top:4px;
+}
+
+/* BOTTOM LEFT */
+.left{
+  position:absolute;
+  left:10px;
+  bottom:20px;
+  color:#fff;
+  font-size:12px;
+  opacity:.9;
+}
 
 /* CONTROLS */
 .controls{
-  position:absolute;left:12px;bottom:20px;display:flex;gap:10px
+  position:absolute;
+  left:10px;
+  top:20px;
+  display:flex;
+  gap:8px;
+  pointer-events:auto;
 }
-.ctrl{
-  background:rgba(0,0,0,.55);color:#fff;border-radius:999px;
-  padding:8px 12px;font-size:12px
+.btn{
+  background:rgba(0,0,0,.55);
+  color:#fff;
+  padding:6px 10px;
+  border-radius:999px;
+  font-size:11px;
 }
 </style>
 </head>
 
 <body>
+
 <div class="feed" id="feed"></div>
 
 <script>
-/* ===== helpers ===== */
+/* ===== helper ===== */
 const rand=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const pick=a=>a[Math.floor(Math.random()*a.length)];
-const users=["@nina_","@jordanx","@alexv","@mika","@luna","@dion","@kay","@rio","@sasha"];
-const avatars=[1,2,3,4,5,6,7,8,9].map(i=>`https://i.pravatar.cc/150?img=${i}`);
 
-/* ===== get list ===== */
+const users=["@nina","@alex","@luna","@mika","@jordan","@kay","@rio"];
+const avatars=[1,2,3,4,5,6,7,8].map(i=>`https://i.pravatar.cc/150?img=${i}`);
+
+/* ===== data ===== */
 const qs=new URLSearchParams(location.search);
 const raw=qs.get("v");
 if(!raw) location.href="/";
@@ -53,8 +123,8 @@ const feed=document.getElementById("feed");
 
 /* ===== render ===== */
 list.forEach(src=>{
-  const like=rand(1_200,98_000);
-  const cmt=rand(50,4_900);
+  const like=rand(1200,98000);
+  const cmt=rand(50,4200);
   const user=pick(users);
   const ava=pick(avatars);
 
@@ -63,45 +133,52 @@ list.forEach(src=>{
   d.innerHTML=`
     <video src="${src}" muted playsinline preload="auto"></video>
 
-    <div class="ui">
-      <div class="avatar" style="background-image:url('${ava}')"></div>
-      <div class="btn">❤️<span>${like.toLocaleString()}</span></div>
-      <div class="btn">💬<span>${cmt.toLocaleString()}</span></div>
-      <div class="btn">↗️<span>Share</span></div>
-      <div style="font-size:11px;opacity:.8">${user}</div>
-    </div>
+    <div class="overlay">
+      <div class="controls">
+        <div class="btn pause">⏸</div>
+        <div class="btn speed">1x</div>
+      </div>
 
-    <div class="controls">
-      <div class="ctrl pause">⏸ Pause</div>
-      <div class="ctrl speed">⏩ 1x</div>
+      <div class="right">
+        <div class="avatar" style="background-image:url('${ava}')"></div>
+        <div class="icon">❤️<span>${like.toLocaleString()}</span></div>
+        <div class="icon">💬<span>${cmt.toLocaleString()}</span></div>
+        <div class="icon">↗️<span>Share</span></div>
+      </div>
+
+      <div class="left">
+        <b>${user}</b><br>
+        Swipe up for more
+      </div>
     </div>
   `;
   feed.appendChild(d);
 });
 
-/* ===== playback logic ===== */
+/* ===== playback ===== */
 const videos=[...document.querySelectorAll("video")];
 let current=null;
 
-const observer=new IntersectionObserver(entries=>{
+const obs=new IntersectionObserver(entries=>{
   entries.forEach(e=>{
     const v=e.target;
     if(e.isIntersecting){
-      current=v; v.play().catch(()=>{});
+      current=v;
+      v.play().catch(()=>{});
     }else{
       v.pause();
     }
   });
 },{threshold:.6});
 
-videos.forEach(v=>observer.observe(v));
+videos.forEach(v=>obs.observe(v));
 
-/* unmute on first tap */
+/* unmute */
 document.body.addEventListener("click",()=>{
   videos.forEach(v=>v.muted=false);
 },{once:true});
 
-/* pause / speed buttons */
+/* controls */
 document.querySelectorAll(".item").forEach(item=>{
   const v=item.querySelector("video");
   const p=item.querySelector(".pause");
@@ -109,16 +186,17 @@ document.querySelectorAll(".item").forEach(item=>{
   let sp=1;
 
   p.onclick=()=>{
-    if(v.paused){v.play();p.textContent="⏸ Pause";}
-    else{v.pause();p.textContent="▶️ Play";}
+    if(v.paused){v.play();p.textContent="⏸";}
+    else{v.pause();p.textContent="▶️";}
   };
 
   s.onclick=()=>{
     sp = sp===1 ? 1.5 : sp===1.5 ? 2 : 1;
     v.playbackRate=sp;
-    s.textContent=`⏩ ${sp}x`;
+    s.textContent=sp+"x";
   };
 });
 </script>
+
 </body>
 </html>
