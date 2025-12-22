@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>MyShorts</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>body{background:#000;color:#fff}</style>
+</head>
+<body>
+
+<div class="sticky top-0 bg-black p-4 text-center border-b border-gray-800">
+  <h1 class="text-2xl font-black">MyShorts.COM</h1>
+</div>
+
+<div class="p-2">
+  <div id="grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2"></div>
+</div>
+
+<script>
+const items = [
+  {
+    thumb: "https://via.placeholder.com/400x700",
+    type: "image",
+    code: "a1"
+  },
+  {
+    thumb: "https://cdn.videy.co/example.mp4",
+    type: "video",
+    code: "b2"
+  }
+];
+
+const grid = document.getElementById("grid");
+
+items.forEach(i => {
+  const a = document.createElement("a");
+  a.href = "go.html?id=" + i.code;
+  a.className = "relative aspect-[9/16] overflow-hidden rounded-lg bg-gray-900";
+
+  a.innerHTML = `
+    ${i.type === "video"
+      ? `<video src="${i.thumb}" muted playsinline class="w-full h-full object-cover"></video>`
+      : `<img src="${i.thumb}" class="w-full h-full object-cover">`
+    }
+    <div class="absolute inset-0 flex items-center justify-center bg-black/40">
+      ▶
+    </div>
+  `;
+
+  grid.appendChild(a);
+});
+</script>
+
+</body>
+</html>
