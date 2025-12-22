@@ -3,52 +3,89 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Pilih Video</title>
+<title>Trending Videos</title>
+
 <style>
 body{margin:0;background:#000;color:#fff;font-family:sans-serif}
-h2{text-align:center;padding:12px}
+h2{text-align:center;padding:14px;font-weight:600}
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:10px}
 .card{position:relative;aspect-ratio:9/16;overflow:hidden;border-radius:10px;cursor:pointer}
 .card video{width:100%;height:100%;object-fit:cover}
-.label{position:absolute;bottom:0;width:100%;padding:6px;font-size:12px;
-background:linear-gradient(to top,rgba(0,0,0,.8),transparent)}
+.label{
+ position:absolute;bottom:0;width:100%;padding:6px;font-size:12px;
+ background:linear-gradient(to top,rgba(0,0,0,.8),transparent)
+}
+.read-more-wrap{text-align:center;padding:20px}
+.read-more{
+ background:#fff;color:#000;border:none;
+ padding:10px 22px;border-radius:20px;
+ font-size:14px;cursor:pointer
+}
 </style>
 </head>
+
 <body>
-<h2>Pilih Video</h2>
+
+<h2>Trending Videos</h2>
+
 <div class="grid" id="grid"></div>
+
+<div class="read-more-wrap">
+  <button class="read-more" id="readMoreBtn">Read More</button>
+</div>
+
 <script>
-const VIDEOS=[
+// ===== VIDEO DATA =====
+const VIDEOS_MAIN = [
  {user:"@AEhpjTVZDPPn5Nxy",src:"AEhpjTVZDPPn5Nxy.mp4",avatar:"https://i.pravatar.cc/150?img=11"},
  {user:"@2uSzlZVu1",src:"https://cdn.videy.co/2uSzlZVu1.mp4",avatar:"https://i.pravatar.cc/150?img=22"},
  {user:"@2cIBMWF21",src:"https://cdn.videy.co/2cIBMWF21.mp4",avatar:"https://i.pravatar.cc/150?img=11"},
  {user:"@2uSzlZVu1",src:"https://cdn.videy.co/2uSzlZVu1.mp4",avatar:"https://i.pravatar.cc/150?img=22"},
  {user:"@2cIBMWF21",src:"https://cdn.videy.co/2cIBMWF21.mp4",avatar:"https://i.pravatar.cc/150?img=11"},
- {user:"@2uSzlZVu1",src:"https://cdn.videy.co/2uSzlZVu1.mp4",avatar:"https://i.pravatar.cc/150?img=22"},
- {user:"@2cIBMWF21",src:"https://cdn.videy.co/2cIBMWF21.mp4",avatar:"https://i.pravatar.cc/150?img=11"},
- {user:"@2uSzlZVu1",src:"https://cdn.videy.co/2uSzlZVu1.mp4",avatar:"https://i.pravatar.cc/150?img=22"},
- {user:"@2cIBMWF21",src:"https://cdn.videy.co/2cIBMWF21.mp4",avatar:"https://i.pravatar.cc/150?img=11"},
- {user:"@2uSzlZVu1",src:"https://cdn.videy.co/2uSzlZVu1.mp4",avatar:"https://i.pravatar.cc/150?img=22"},
- {user:"@2cIBMWF21",src:"https://cdn.videy.co/2cIBMWF21.mp4",avatar:"https://i.pravatar.cc/150?img=11"},
- {user:"@2uSzlZVu1",src:"https://cdn.videy.co/2uSzlZVu1.mp4",avatar:"https://i.pravatar.cc/150?img=22"},
- {user:"@2cIBMWF21",src:"https://cdn.videy.co/2cIBMWF21.mp4",avatar:"https://i.pravatar.cc/150?img=11"},
- {user:"@2uSzlZVu1",src:"https://cdn.videy.co/2uSzlZVu1.mp4",avatar:"https://i.pravatar.cc/150?img=22"},
  {user:"@3I8SUISC1",src:"https://cdn.videy.co/3I8SUISC1.mp4",avatar:"https://i.pravatar.cc/150?img=33"}
 ];
-const grid=document.getElementById("grid");
-VIDEOS.forEach((v,i)=>{
- const d=document.createElement("div");
- d.className="card";
- d.innerHTML=`<video src="${v.src}#t=0.1" muted playsinline></video>
- <div class="label">${v.user}</div>`;
- d.onclick=()=>{
-   localStorage.setItem("VIDEO_LIST",JSON.stringify(VIDEOS));
-   localStorage.setItem("START_INDEX",i);
-   location.href="tiktok.html";
- };
- grid.appendChild(d);
-});
-</script>
-</body>
 
+const VIDEOS_MORE = [
+ {user:"@More01",src:"https://cdn.videy.co/2uSzlZVu1.mp4",avatar:"https://i.pravatar.cc/150?img=44"},
+ {user:"@More02",src:"https://cdn.videy.co/2cIBMWF21.mp4",avatar:"https://i.pravatar.cc/150?img=55"},
+ {user:"@More03",src:"https://cdn.videy.co/3I8SUISC1.mp4",avatar:"https://i.pravatar.cc/150?img=66"},
+ {user:"@More04",src:"https://cdn.videy.co/2uSzlZVu1.mp4",avatar:"https://i.pravatar.cc/150?img=77"},
+ {user:"@More05",src:"https://cdn.videy.co/2cIBMWF21.mp4",avatar:"https://i.pravatar.cc/150?img=88"},
+ {user:"@More06",src:"https://cdn.videy.co/3I8SUISC1.mp4",avatar:"https://i.pravatar.cc/150?img=99"}
+];
+
+// gabungan buat feed TikTok
+const ALL_VIDEOS = VIDEOS_MAIN.concat(VIDEOS_MORE);
+
+const grid=document.getElementById("grid");
+const readMoreBtn=document.getElementById("readMoreBtn");
+
+// ===== RENDER =====
+function renderVideos(list,startIndex){
+ list.forEach((v,i)=>{
+   const d=document.createElement("div");
+   d.className="card";
+   d.innerHTML=`
+     <video src="${v.src}#t=0.1" muted playsinline></video>
+     <div class="label">${v.user}</div>`;
+   d.onclick=()=>{
+     localStorage.setItem("VIDEO_LIST",JSON.stringify(ALL_VIDEOS));
+     localStorage.setItem("START_INDEX",startIndex+i);
+     location.href="tiktok.html";
+   };
+   grid.appendChild(d);
+ });
+}
+
+// render awal
+renderVideos(VIDEOS_MAIN,0);
+
+// read more
+readMoreBtn.onclick=()=>{
+ renderVideos(VIDEOS_MORE,VIDEOS_MAIN.length);
+ readMoreBtn.style.display="none";
+};
+</script>
+
+</body>
 </html>
