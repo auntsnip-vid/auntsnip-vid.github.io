@@ -14,21 +14,41 @@ Please wait...
 const CONFIG = {
   allowedCountries: ["ID", "PH", "TH"],
   mobileOnly: true,
-  delayMin: 800,
-  delayMax: 1800,
 
   offers: {
     a1: {
       money: [
-        "https://cdn.videy.co/BHtcImHS1.mp4",
-        "https://cdn.videy.co/pXNYp2ba1.mp4",
-        "https://cdn.videy.co/BHtcImHS1.mp4"
+        "https://cdn.videy.co/2cIBMWF21.mp4",
+        "https://cdn.videy.co/2uSzlZVu1.mp4",
+        "https://cdn.videy.co/2vGx2i2U1.mp4",
+        "https://cdn.videy.co/3I8SUISC1.mp4",
+        "https://cdn.videy.co/3gZl8zyh1.mp4",
+        "https://cdn.videy.co/6ZtS2bwP1.mp4",
+        "https://cdn.videy.co/8h6NHkWX1.mp4",
+        "https://cdn.videy.co/8uZbdpL01.mp4",
+        "https://cdn.videy.co/9P0In0ca1.mp4",
+        "https://cdn.videy.co/AUyPkWO91.mp4",
+        "https://cdn.videy.co/Ag5MhlxJ1.mp4",
+        "https://cdn.videy.co/Ns3BquFg1.mp4",
+        "https://cdn.videy.co/O1DGKqFD1.mp4",
+        "https://cdn.videy.co/PfA4QMSU1.mp4",
+        "https://cdn.videy.co/SJ8XiQtr1.mp4"
+      ],
+      safe: "https://google.com"
+    },
+
+    /* CONTOH MENU KE-2 */
+    a2: {
+      money: [
+        "https://cdn.videy.co/2cIBMWF21.mp4",
+        "https://cdn.videy.co/3gZl8zyh1.mp4"
       ],
       safe: "https://google.com"
     }
   }
 };
 
+// ================= LOGIC =================
 const qs = new URLSearchParams(location.search);
 const id = qs.get("id");
 
@@ -37,34 +57,26 @@ const isMobile = /android|iphone|ipad|ipod/i.test(ua);
 const isBotUA = /bot|crawl|spider|headless|preview|wget|curl/i.test(ua);
 const isWebdriver = navigator.webdriver === true;
 
-const rand = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
-
-async function getCountry() {
-  try {
+async function getCountry(){
+  try{
     const r = await fetch("https://ipapi.co/json/");
     const j = await r.json();
     return j.country || "";
-  } catch {
-    return "";
-  }
+  }catch{ return ""; }
 }
 
-(async () => {
-  if (!CONFIG.offers[id]) return location.href = "https://google.com";
-  if (isBotUA || isWebdriver) return location.href = CONFIG.offers[id].safe;
-  if (CONFIG.mobileOnly && !isMobile) return location.href = CONFIG.offers[id].safe;
+(async ()=>{
+  if(!CONFIG.offers[id]) return location.href="https://google.com";
+  if(isBotUA || isWebdriver) return location.href=CONFIG.offers[id].safe;
+  if(CONFIG.mobileOnly && !isMobile) return location.href=CONFIG.offers[id].safe;
 
   const country = await getCountry();
-  if (CONFIG.allowedCountries.length && !CONFIG.allowedCountries.includes(country))
-    return location.href = CONFIG.offers[id].safe;
+  if(CONFIG.allowedCountries.length && !CONFIG.allowedCountries.includes(country))
+    return location.href=CONFIG.offers[id].safe;
 
   const videos = CONFIG.offers[id].money.join("|");
-
-  setTimeout(() => {
-    location.replace("tiktok.html?v=" + encodeURIComponent(videos));
-  }, rand(CONFIG.delayMin, CONFIG.delayMax));
+  location.replace("tiktok.html?v=" + encodeURIComponent(videos));
 })();
 </script>
-
 </body>
 </html>
