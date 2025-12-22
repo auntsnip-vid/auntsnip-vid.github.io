@@ -84,7 +84,7 @@ function renderVideos(list,startIndex){
    d.onclick=()=>{
      localStorage.setItem("VIDEO_LIST",JSON.stringify(ALL_VIDEOS));
      localStorage.setItem("START_INDEX",startIndex+i);
-     location.href="playback.html";
+     location.href="playback";
    };
    grid.appendChild(d);
  });
