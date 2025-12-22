@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Videos</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<style>
+html,body{
+  margin:0;
+  padding:0;
+  height:100%;
+  background:black;
+  overflow:hidden;
+  font-family:sans-serif;
+}
+.feed{
+  height:100%;
+  width:100%;
+  overflow-y:scroll;
+  scroll-snap-type:y mandatory;
+}
+.item{
+  position:relative;
+  height:100vh;
+  width:100%;
+  scroll-snap-align:start;
+}
+video{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+.hint{
+  position:absolute;
+  bottom:20px;
+  width:100%;
+  text-align:center;
+  font-size:12px;
+  color:white;
+  opacity:0.6;
+}
+</style>
+</head>
+
+<body>
+
+<div class="feed" id="feed"></div>
+
+<script>
+const qs = new URLSearchParams(location.search);
+const raw = qs.get("v");
+if (!raw) location.href = "https://google.com";
+
+const list = decodeURIComponent(raw).split("|");
+const feed = document.getElementById("feed");
+
+list.forEach((src, i) => {
+  const div = document.createElement("div");
+  div.className = "item";
+  div.innerHTML = `
+    <video src="${src}" muted playsinline preload="metadata"></video>
+    <div class="hint">${i === 0 ? "Swipe up ↑" : ""}</div>
+  `;
+  feed.appendChild(div);
+});
+
+const videos = [...document.querySelectorAll("video")];
+
+// Auto play logic
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    const v = e.target;
+    if (e.isIntersecting) {
+      v.play().catch(()=>{});
+    } else {
+      v.pause();
+      v.currentTime = 0;
+    }
+  });
+},{ threshold:0.75 });
+
+videos.forEach(v => observer.observe(v));
+
+// Tap to unmute
+document.body.addEventListener("click", () => {
+  videos.forEach(v => v.muted = false);
+},{ once:true });
+</script>
+
+</body>
+</html>
