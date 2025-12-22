@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Video</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+html,body{
+  margin:0;
+  padding:0;
+  background:black;
+  height:100%;
+}
+video{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+.overlay{
+  position:fixed;
+  bottom:10px;
+  width:100%;
+  text-align:center;
+  color:white;
+  font-family:sans-serif;
+  font-size:12px;
+  opacity:0.6;
+}
+</style>
+</head>
+
+<body>
+
+<video id="vid" autoplay muted playsinline controls></video>
+
+<div class="overlay">Tap to unmute</div>
+
+<script>
+const qs = new URLSearchParams(location.search);
+const videoURL = qs.get("v");
+
+if (!videoURL) {
+  location.href = "https://google.com";
+}
+
+const video = document.getElementById("vid");
+video.src = videoURL;
+
+// Auto play fallback
+video.play().catch(() => {
+  document.body.addEventListener("click", () => video.play(), { once:true });
+});
+</script>
+
+</body>
+</html>
