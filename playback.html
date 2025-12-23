@@ -1,9 +1,8 @@
-
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
 html,body{
@@ -11,6 +10,7 @@ html,body{
   height:100%;
   background:#000;
   overflow:hidden;
+  font-family:sans-serif;
 }
 
 /* ===== TOP AD ===== */
@@ -46,6 +46,7 @@ video{
   width:100%;
   height:100%;
   object-fit:cover;
+  background:#000;
 }
 
 /* USER INFO */
@@ -85,6 +86,10 @@ video{
   user-select:none;
 }
 
+.actions .liked{
+  color:#ff2d55;
+}
+
 .count{
   font-size:12px;
   opacity:.8;
@@ -96,7 +101,7 @@ video{
   top:20px;
   right:20px;
   font-size:22px;
-  background:rgba(0,0,0,.4);
+  background:rgba(0,0,0,.5);
   padding:8px;
   border-radius:50%;
   cursor:pointer;
@@ -107,13 +112,13 @@ video{
 
 <!-- ===== IKLAN ATAS ===== -->
 <div id="ad-top">
-  <script type="text/javascript">
+  <script>
     atOptions = {
-      'key' : 'a56d9957870f34de53762968bb2255c5',
-      'format' : 'iframe',
-      'height' : 50,
-      'width' : 320,
-      'params' : {}
+      key : 'a56d9957870f34de53762968bb2255c5',
+      format : 'iframe',
+      height : 50,
+      width : 320,
+      params : {}
     };
   </script>
   <script src="https://situateddivine.com/a56d9957870f34de53762968bb2255c5/invoke.js"></script>
@@ -122,34 +127,59 @@ video{
 <div class="feed" id="feed"></div>
 
 <script>
-let currentVideo=null;
+let currentVideo = null;
+let scrollLocked = false;
 
-/* ===== TOGGLE SOUND PER VIDEO ===== */
+/* ===== TOGGLE SOUND ===== */
 function toggleSound(btn){
-  const item=btn.closest(".item");
-  const video=item.querySelector("video");
-
-  video.muted=!video.muted;
-  btn.textContent=video.muted?"🔇":"🔊";
+  const video = btn.closest(".item").querySelector("video");
+  video.muted = !video.muted;
+  btn.textContent = video.muted ? "🔇" : "🔊";
 }
 
-/* ===== VIDEO FEED ===== */
+/* ===== LIKE ===== */
+function like(el){
+  el.classList.toggle("liked");
+  const c = el.querySelector(".count");
+  let n = parseInt(c.textContent);
+  c.textContent = el.classList.contains("liked") ? n+1 : n-1;
+}
+
+/* ===== SCROLL LOCK ===== */
+function lockScroll(){
+  scrollLocked = true;
+  setTimeout(()=>scrollLocked=false, 500);
+}
+
+const feed = document.getElementById("feed");
+feed.addEventListener("wheel",e=>{
+  if(scrollLocked) e.preventDefault();
+},{passive:false});
+
+feed.addEventListener("touchmove",e=>{
+  if(scrollLocked) e.preventDefault();
+},{passive:false});
+
+/* ===== LOAD VIDEO LIST ===== */
 const list = JSON.parse(localStorage.getItem("VIDEO_LIST")) || [];
-let start = parseInt(localStorage.getItem("START_INDEX")) || 0;
-if(!list.length) location.href="index.html";
+const start = parseInt(localStorage.getItem("START_INDEX")) || 0;
 
-const feed=document.getElementById("feed");
-const ordered=[...list.slice(start),...list.slice(0,start)];
+if(!list.length){
+  location.href="index.html";
+}
 
+const ordered = [...list.slice(start), ...list.slice(0,start)];
+
+/* ===== BUILD FEED ===== */
 ordered.forEach(v=>{
-  const likes=Math.floor(Math.random()*900)+100;
-  const comments=Math.floor(Math.random()*300)+20;
-  const avatar=`https://i.pravatar.cc/150?u=${v.user}`;
+  const likes = Math.floor(Math.random()*900)+100;
+  const comments = Math.floor(Math.random()*300)+20;
+  const avatar = `https://i.pravatar.cc/150?u=${v.user}`;
 
-  const d=document.createElement("div");
-  d.className="item";
-  d.innerHTML=`
-    <video src="${v.src}" muted loop playsinline></video>
+  const d = document.createElement("div");
+  d.className = "item";
+  d.innerHTML = `
+    <video src="${v.src}" muted loop playsinline preload="metadata"></video>
 
     <div class="sound" onclick="toggleSound(this)">🔇</div>
 
@@ -172,70 +202,53 @@ ordered.forEach(v=>{
   feed.appendChild(d);
 });
 
-/* ===== LIKE ===== */
-function like(el){
-  el.classList.toggle("liked");
-  const c=el.querySelector(".count");
-  c.textContent=parseInt(c.textContent)+(el.classList.contains("liked")?1:-1);
-}
-
-/* ===== SCROLL LOCK ===== */
-let scrollLocked=false;
-function lockScroll(){
-  scrollLocked=true;
-  setTimeout(()=>scrollLocked=false,600);
-}
-
-feed.addEventListener("wheel",e=>{
-  if(scrollLocked) e.preventDefault();
-},{passive:false});
-
-feed.addEventListener("touchmove",e=>{
-  if(scrollLocked) e.preventDefault();
-},{passive:false});
-
 /* ===== OBSERVER ===== */
-const observer=new IntersectionObserver(entries=>{
+const observer = new IntersectionObserver(entries=>{
   entries.forEach(e=>{
-    const v=e.target.querySelector("video");
-    const soundBtn=e.target.querySelector(".sound");
+    const video = e.target.querySelector("video");
+    const soundBtn = e.target.querySelector(".sound");
 
     if(e.isIntersecting){
       lockScroll();
 
-      if(currentVideo && currentVideo!==v){
+      if(currentVideo && currentVideo !== video){
         currentVideo.pause();
-        currentVideo.muted=true;
-        currentVideo.currentTime=0;
+        currentVideo.currentTime = 0;
+        currentVideo.muted = true;
       }
 
-      currentVideo=v;
-      v.play().catch(()=>{});
-
-      // update icon sesuai status video
-      soundBtn.textContent=v.muted?"🔇":"🔊";
+      currentVideo = video;
+      video.play().catch(()=>{});
+      soundBtn.textContent = video.muted ? "🔇" : "🔊";
     }else{
-      v.pause();
+      video.pause();
     }
   });
-},{threshold:0.8});
+},{threshold:0.75});
 
 document.querySelectorAll(".item").forEach(i=>observer.observe(i));
 </script>
- 
+
 <script src="https://situateddivine.com/b8/1f/13/b81f134cc26510fc67813f6dca90178f.js"></script>
+
+<!-- ===== HISTATS ===== -->
+<script>
+var _Hasync=_Hasync||[];
+_Hasync.push(['Histats.start','1,4992245,4,511,95,18,00000000']);
+_Hasync.push(['Histats.fasi','1']);
+_Hasync.push(['Histats.track_hits','']);
+(function(){
+  var hs=document.createElement('script');
+  hs.async=true;
+  hs.src='//s10.histats.com/js15_as.js';
+  document.body.appendChild(hs);
+})();
+</script>
+<noscript>
+<a href="/" target="_blank">
+<img src="//sstatic1.histats.com/0.gif?4992245&101" border="0">
+</a>
+</noscript>
 
 </body>
 </html>
-<!-- Histats.com  START  (aync)-->
-<script type="text/javascript">var _Hasync= _Hasync|| [];
-_Hasync.push(['Histats.start', '1,4992245,4,511,95,18,00000000']);
-_Hasync.push(['Histats.fasi', '1']);
-_Hasync.push(['Histats.track_hits', '']);
-(function() {
-var hs = document.createElement('script'); hs.type = 'text/javascript'; hs.async = true;
-hs.src = ('//s10.histats.com/js15_as.js');
-(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(hs);
-})();</script>
-<noscript><a href="/" target="_blank"><img  src="//sstatic1.histats.com/0.gif?4992245&101" alt="" border="0"></a></noscript>
-<!-- Histats.com  END  -->
