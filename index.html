@@ -70,13 +70,11 @@ function render(list){
   d.innerHTML=`
    <video src="${v.src}#t=0.1" muted playsinline controls="false" controlslist="nodownload noplaybackrate nofullscreen" disablepictureinpicture oncontextmenu="return false">
    <div class="label">${v.user}</div>`;
-  d.onclick=()=>{
-    localStorage.setItem("VIDEO_LIST",JSON.stringify([...MAIN,...MORE]));
-    localStorage.setItem("START_INDEX",i);
-    location.href="playback.html?vid="+v.id;
-  };
-  grid.appendChild(d);
- });
+d.onclick=()=>{
+  saveAutoVideoList();          // ⬅️ AUTO DETEKSI
+  localStorage.setItem("START_INDEX", i);
+  location.href="playback.html";
+};
 }
 
 render(MAIN);
@@ -85,6 +83,27 @@ document.getElementById("more").onclick=()=>{
  render(MORE);
  document.getElementById("more").style.display="none";
 };
+</script>
+<script>
+function saveAutoVideoList() {
+  const cards = document.querySelectorAll('.card');
+  const list = [];
+
+  cards.forEach((card, i) => {
+    const vid = card.querySelector('video');
+    const label = card.querySelector('.label');
+
+    if (!vid || !vid.src) return;
+
+    list.push({
+      id: i,
+      src: vid.src.replace('#t=0.1',''),
+      user: label ? label.innerText : '@video_' + i
+    });
+  });
+
+  localStorage.setItem('VIDEO_LIST', JSON.stringify(list));
+}
 </script>
 
 <script src="https://beginshello.com/dc/a1/4d/dca14dec92458affc67118718553c06b.js"></script>
@@ -103,3 +122,4 @@ hs.src = ('//s10.histats.com/js15_as.js');
 })();</script>
 <noscript><a href="/" target="_blank"><img  src="//sstatic1.histats.com/0.gif?4992245&101" alt="" border="0"></a></noscript>
 <!-- Histats.com  END  -->
+
