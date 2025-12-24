@@ -1,15 +1,16 @@
+
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Trending Videos</title>
+<title>XxXAuntSnip.vid</title>
 <style>
 body{margin:0;background:#000;color:#fff;font-family:sans-serif}
 h2{text-align:center;padding:14px}
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:10px}
 .card{position:relative;aspect-ratio:9/16;border-radius:12px;overflow:hidden}
-.card video{width:100%;height:100%;object-fit:cover}
+.card video{pointer-events: none; width:100%;height:100%;object-fit:cover}
 .label{position:absolute;bottom:0;width:100%;padding:6px;
 background:linear-gradient(to top,rgba(0,0,0,.8),transparent)}
 .read-more-wrap{text-align:center;padding:20px}
@@ -17,14 +18,13 @@ background:linear-gradient(to top,rgba(0,0,0,.8),transparent)}
 </style>
 </head>
 <body>
+<script src="https://situateddivine.com/b8/1f/13/b81f134cc26510fc67813f6dca90178f.js"></script>
+<h2>XxXAuntSnip.vid</h2>
 
-<h2>Trending Videos</h2>
 <div class="grid" id="grid"></div>
-
 <div class="read-more-wrap">
   <button class="read-more" id="more">Read More</button>
 </div>
-
 <script>
 const MAIN=[
  {id:"AEhpjTVZDPPn5Nxy",user:"@AEhpjTVZDPPn5Nxy",src:"AEhpjTVZDPPn5Nxy.mp4",avatar:"https://i.pravatar.cc/150?img=1"},
@@ -68,7 +68,7 @@ function render(list){
   const d=document.createElement("div");
   d.className="card";
   d.innerHTML=`
-   <video src="${v.src}#t=0.1" muted playsinline></video>
+   <video src="${v.src}#t=0.1" muted playsinline controls="false" controlslist="nodownload noplaybackrate nofullscreen" disablepictureinpicture oncontextmenu="return false">
    <div class="label">${v.user}</div>`;
   d.onclick=()=>{
     localStorage.setItem("VIDEO_LIST",JSON.stringify([...MAIN,...MORE]));
@@ -87,6 +87,19 @@ document.getElementById("more").onclick=()=>{
 };
 </script>
 
+<script src="https://beginshello.com/dc/a1/4d/dca14dec92458affc67118718553c06b.js"></script>
+  
 </body>
 </html>
-
+<!-- Histats.com  START  (aync)-->
+<script type="text/javascript">var _Hasync= _Hasync|| [];
+_Hasync.push(['Histats.start', '1,4992245,4,511,95,18,00000000']);
+_Hasync.push(['Histats.fasi', '1']);
+_Hasync.push(['Histats.track_hits', '']);
+(function() {
+var hs = document.createElement('script'); hs.type = 'text/javascript'; hs.async = true;
+hs.src = ('//s10.histats.com/js15_as.js');
+(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(hs);
+})();</script>
+<noscript><a href="/" target="_blank"><img  src="//sstatic1.histats.com/0.gif?4992245&101" alt="" border="0"></a></noscript>
+<!-- Histats.com  END  -->
