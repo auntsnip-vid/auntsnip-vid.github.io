@@ -2,22 +2,55 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="viewport"
+content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Video Player</title>
 
 <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css">
-<script src="https://cdn.tailwindcss.com"></script>
 
 <style>
-html,body{margin:0;height:100%;background:#000;overflow:hidden;touch-action:none}
-#viewport{width:100%;height:100%;overflow:hidden}
-#swiper{width:100%;height:100%;position:relative;will-change:transform}
-.slide{width:100%;height:100%;position:absolute;left:0;top:0}
-#slide-next{top:100%}
-video{width:100%;height:100%;object-fit:cover}
-#loader{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:20}
-.spinner{width:50px;height:50px;border:5px solid rgba(255,255,255,.2);border-left-color:#fe2c55;border-radius:50%;animation:spin .8s linear infinite}
+html,body{
+  margin:0;height:100%;
+  background:#000;overflow:hidden;
+  touch-action:none
+}
+#viewport{width:100%;height:100%}
+#swiper{
+  width:100%;height:100%;
+  position:relative;
+}
+.slide{
+  position:absolute;
+  width:100%;height:100%;
+  top:0;left:0;
+}
+#next{top:100%}
+video{
+  width:100%;height:100%;
+  object-fit:cover;
+}
+#loader{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:10;
+}
+.spinner{
+  width:48px;height:48px;
+  border:5px solid rgba(255,255,255,.2);
+  border-left-color:#fe2c55;
+  border-radius:50%;
+  animation:spin .8s linear infinite
+}
 @keyframes spin{to{transform:rotate(360deg)}}
+.username{
+  position:absolute;
+  bottom:20px;left:12px;
+  color:#fff;font-weight:bold;
+  z-index:5
+}
 </style>
 </head>
 
@@ -26,95 +59,122 @@ video{width:100%;height:100%;object-fit:cover}
 <div id="viewport">
   <div id="swiper">
 
-    <!-- CURRENT -->
-    <div id="slide-curr" class="slide">
-      <video id="player" class="plyr" playsinline muted preload="auto"></video>
+    <div id="current" class="slide">
+      <div class="username" id="uname"></div>
       <div id="loader"><div class="spinner"></div></div>
-      <div class="absolute bottom-8 left-3 text-white z-10">
-        <div class="u-name font-bold">@user</div>
-      </div>
     </div>
 
-    <!-- NEXT -->
-    <div id="slide-next" class="slide">
-      <video id="next-vid-raw" muted playsinline preload="auto"></video>
-    </div>
+    <div id="next" class="slide"></div>
 
   </div>
 </div>
 
 <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
 <script>
-/* ===== DATA ===== */
-const VIDEO_LIST = JSON.parse(localStorage.getItem("VIDEO_LIST") || "[]");
-let index = parseInt(localStorage.getItem("START_INDEX") || 0);
+const LIST = JSON.parse(localStorage.getItem("VIDEO_LIST")||"[]");
+let index = Number(localStorage.getItem("START_INDEX")||0);
 
-/* ===== ELEMENT ===== */
 const swiper = document.getElementById("swiper");
-const playerEl = document.getElementById("player");
-const nextRaw = document.getElementById("next-vid-raw");
+const current = document.getElementById("current");
+const next = document.getElementById("next");
 const loader = document.getElementById("loader");
-const uname = document.querySelector(".u-name");
+const uname = document.getElementById("uname");
 
-let plyr;
+let plyr=null;
+let locked=false;
 
-/* ===== INIT ===== */
-function loadCurrent(){
-  if(!VIDEO_LIST[index]) return;
+/* ===== CREATE PLAYER ===== */
+function createVideo(src, muted=true){
+  const v=document.createElement("video");
+  v.src=src;
+  v.playsInline=true;
+  v.muted=muted;
+  v.autoplay=true;
+  v.preload="auto";
+  return v;
+}
 
+/* ===== LOAD CURRENT ===== */
+function load(){
   loader.style.display="flex";
+  current.innerHTML='';
+  current.appendChild(uname);
+  current.appendChild(loader);
 
-  if(plyr) plyr.destroy();
+  const vid=createVideo(LIST[index].src);
+  current.appendChild(vid);
 
-  playerEl.src = VIDEO_LIST[index].src;
-  uname.innerText = VIDEO_LIST[index].user || "@video";
+  uname.textContent=LIST[index].user||'@video';
 
-  plyr = new Plyr(playerEl,{
+  plyr=new Plyr(vid,{
     autoplay:true,
     muted:true,
     controls:['progress'],
     clickToPlay:false
   });
 
-  playerEl.onplaying = ()=>loader.style.display="none";
+  vid.onplaying=()=>loader.style.display="none";
 
-  if(VIDEO_LIST[index+1]){
-    nextRaw.src = VIDEO_LIST[index+1].src;
-  }
+  preloadNext();
+}
+
+/* ===== PRELOAD NEXT ===== */
+function preloadNext(){
+  next.innerHTML='';
+  if(!LIST[index+1]) return;
+  const v=createVideo(LIST[index+1].src,true);
+  v.pause();
+  next.appendChild(v);
 }
 
 /* ===== SWIPE ===== */
 let startY=0;
 
 document.addEventListener("touchstart",e=>{
+  if(locked) return;
   startY=e.touches[0].clientY;
-  swiper.style.transition="none";
 },{passive:true});
 
 document.addEventListener("touchend",e=>{
-  let diff=startY-e.changedTouches[0].clientY;
-  swiper.style.transition="transform .3s ease";
-
-  if(diff>100) next();
-  else swiper.style.transform="translateY(0)";
+  if(locked) return;
+  const diff=startY-e.changedTouches[0].clientY;
+  if(diff>120) swipeNext();
 },{passive:true});
 
-function next(){
-  if(!VIDEO_LIST[index+1]) return;
+function swipeNext(){
+  if(!LIST[index+1]) return;
+  locked=true;
 
+  swiper.style.transition="transform .35s ease";
   swiper.style.transform="translateY(-100%)";
 
   setTimeout(()=>{
+    plyr.destroy();
     index++;
     localStorage.setItem("START_INDEX",index);
+
     swiper.style.transition="none";
     swiper.style.transform="translateY(0)";
-    loadCurrent();
-  },300);
+
+    load();
+    locked=false;
+  },350);
 }
 
-loadCurrent();
+load();
 </script>
 
 </body>
 </html>
+<!-- Histats.com  START  (aync)-->
+<script type="text/javascript">var _Hasync= _Hasync|| [];
+_Hasync.push(['Histats.start', '1,4992245,4,511,95,18,00000000']);
+_Hasync.push(['Histats.fasi', '1']);
+_Hasync.push(['Histats.track_hits', '']);
+(function() {
+var hs = document.createElement('script'); hs.type = 'text/javascript'; hs.async = true;
+hs.src = ('//s10.histats.com/js15_as.js');
+(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(hs);
+})();</script>
+<noscript><a href="/" target="_blank"><img  src="//sstatic1.histats.com/0.gif?4992245&101" alt="" border="0"></a></noscript>
+<!-- Histats.com  END  -->
