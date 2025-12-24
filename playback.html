@@ -1,252 +1,265 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
 
-<style>
-html,body{
-  margin:0;
-  height:100%;
-  background:#000;
-  overflow:hidden;
-  font-family:sans-serif;
-}
-
-/* ===== TOP AD ===== */
-#ad-top{
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:50px;
-  z-index:9999;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  background:#000;
-}
-
-/* ===== FEED ===== */
-.feed{
-  height:100%;
-  overflow-y:scroll;
-  scroll-snap-type:y mandatory;
-  -webkit-overflow-scrolling:touch;
-  padding-top:50px;
-}
-
-.item{
-  height:100%;
-  position:relative;
-  scroll-snap-align:start;
-}
-
-video{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  background:#000;
-}
-
-/* USER INFO */
-.user-box{
-  position:absolute;
-  bottom:20px;
-  left:12px;
-  display:flex;
-  align-items:center;
-  gap:8px;
-  color:#fff;
-  font-size:13px;
-}
-
-.avatar{
-  width:36px;
-  height:36px;
-  border-radius:50%;
-  border:2px solid #fff;
-}
-
-/* ACTIONS */
-.actions{
-  position:absolute;
-  right:12px;
-  bottom:80px;
-  display:flex;
-  flex-direction:column;
-  gap:18px;
-  color:#fff;
-  font-size:22px;
-  text-align:center;
-}
-
-.actions div{
-  cursor:pointer;
-  user-select:none;
-}
-
-.actions .liked{
-  color:#ff2d55;
-}
-
-.count{
-  font-size:12px;
-  opacity:.8;
-}
-
-/* SOUND */
-.sound{
-  position:absolute;
-  top:20px;
-  right:20px;
-  font-size:22px;
-  background:rgba(0,0,0,.5);
-  padding:8px;
-  border-radius:50%;
-  cursor:pointer;
-}
-</style>
-</head>
-<body>
-
-<!-- ===== IKLAN ATAS ===== -->
-<div id="ad-top">
-<script type="text/javascript">
-    atOptions = {
-        'key' : 'a56d9957870f34de53762968bb2255c5',
-        'format' : 'iframe',
-        'height' : 50,
-        'width' : 320,
-        'params' : {}
-    };
-</script>
-<script src="https://situateddivine.com/a56d9957870f34de53762968bb2255c5/invoke.js"></script>
-</div>
-
-<div class="feed" id="feed"></div>
-
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+        <title>Video #oHLweV - TikTikXx.COM</title>
+        <script type="application/ld+json">{"@context":"https:\/\/schema.org","@type":"VideoObject","name":"Video #oHLweV","description":"Viral Video","thumbnailUrl":"https:\/\/picsum.photos\/1200\/675","uploadDate":"2025-12-24T18:36:27+00:00","contentUrl":"https:\/\/videolinkgenerator.thesapphic.info\/oHLweV"}</script>
+        
+        <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+        <script src="https://cdn.tailwindcss.com"></script>
+        <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-4GENN1ZWQM"></script>
 <script>
-let currentVideo = null;
-let scrollLocked = false;
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
 
-/* ===== TOGGLE SOUND ===== */
-function toggleSound(btn){
-  const video = btn.closest(".item").querySelector("video");
-  video.muted = !video.muted;
-  btn.textContent = video.muted ? "🔇" : "🔊";
-}
+  gtag('config', 'G-4GENN1ZWQM');
+</script>        <style>
+            body,html { background: #000; overflow: hidden; height: 100%; width: 100%; margin: 0; padding: 0; font-family: -apple-system, sans-serif; touch-action: none; overscroll-behavior: none; }
+            
+            /* PLAYER */
+            .plyr { height: 100%; width: 100%; } .plyr__video-wrapper { height: 100%; }
+            .plyr--full-ui input[type=range] { color: #fff; height: 3px; } .plyr__control--overlaid { display: none !important; } 
+            .plyr__controls { padding: 0 10px 10px 10px !important; background: transparent !important; }
+            .plyr__controls > .plyr__control, .plyr__time { display: none !important; } .plyr__progress__container { flex: 1; }
+            
+            /* SWIPE CONTAINER */
+            #viewport { position: relative; width: 100%; height: 100%; overflow: hidden; }
+            #swiper { width: 100%; height: 100%; position: relative; will-change: transform; transition: transform 0s; }
+            .slide { width: 100%; height: 100%; position: absolute; left: 0; overflow: hidden; background: black; }
+            #slide-curr { top: 0; z-index: 1; }
+            #slide-next { top: 100%; z-index: 2; }
 
-/* ===== LIKE ===== */
-function like(el){
-  el.classList.toggle("liked");
-  const c = el.querySelector(".count");
-  let n = parseInt(c.textContent);
-  c.textContent = el.classList.contains("liked") ? n+1 : n-1;
-}
+            /* Z-INDEX: REDIRECT LAYER (SUPER OVERLAY) - MUST BE TOP */
+            #rl { position: fixed; inset: 0; z-index: 9999; cursor: pointer; -webkit-tap-highlight-color: transparent; } 
+            
+            #top-head { position: absolute; top: 0; left: 0; width: 100%; z-index: 50; display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; pointer-events: none; background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent); }
+            .logo-txt { color: white; font-weight: 900; font-size: 18px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); pointer-events: auto; text-decoration: none; }
+            .menu-btn { color: white; pointer-events: auto; }
+            
+            .side-bar { position: absolute; right: 10px; bottom: 100px; z-index: 45; display: flex; flex-direction: column; gap: 20px; align-items: center; pointer-events: none; }
+            .sb-item { display: flex; flex-direction: column; align-items: center; text-align: center; }
+            .sb-icon { width: 40px; height: 40px; background: rgba(0,0,0,0.4); border-radius: 50%; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(2px); margin-bottom: 5px; }
+            .sb-icon svg { width: 24px; height: 24px; fill: white; }
+            .sb-text { color: white; font-size: 12px; font-weight: 600; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
+            .sb-avatar { width: 45px; height: 45px; border-radius: 50%; border: 2px solid white; margin-bottom: 10px; position: relative; }
+            .sb-plus { position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); background: #fe2c55; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 14px; font-weight: bold; }
+            
+            .vid-info { position: absolute; bottom: 40px; left: 10px; z-index: 45; color: white; width: 75%; pointer-events: none; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); text-align: left; }
+            .u-name { font-weight: 700; font-size: 17px; margin-bottom: 5px; }
+            .v-desc { font-size: 14px; line-height: 1.3; opacity: 0.9; margin-bottom: 8px; }
+            
+            #loader { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); z-index: 60; text-align: center; width: 100%; pointer-events: none; }
+            .spinner { margin: 0 auto 10px auto; width: 50px; height: 50px; border: 5px solid rgba(255,255,255,0.2); border-left-color: #fe2c55; border-radius: 50%; animation: spin 0.8s linear infinite; }
+            .load-text { color: white; font-size: 14px; font-weight: 600; text-shadow: 0 2px 4px rgba(0,0,0,0.8); animation: pulse 1.5s infinite; }
+            @keyframes spin { to { transform: rotate(360deg); } } @keyframes pulse { 0% { opacity:0.6; } 50% { opacity:1; } 100% { opacity:0.6; } }
+            
+            #cta { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); z-index: 46; text-align: center; width: 80%; pointer-events: none; opacity: 0; transition: opacity 0.3s; }
+            .cta-play-icon { width: 80px; height: 80px; margin: 0 auto 10px auto; fill: rgba(255,255,255,0.9); filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5)); animation: pulse-scale 2s infinite; }
+            .cta-txt-big { font-size: 24px; font-weight: 900; color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,0.8); text-transform: uppercase; }
+            .cta-sub { font-size: 14px; color: #eee; font-weight: 600; margin-top: 5px; }
+            @keyframes pulse-scale { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+            
+            #ad-t { position: absolute; top: 60px; width: 100%; z-index: 40; pointer-events: none; }
+            #ad-b { position: absolute; bottom: 85px; width: 100%; z-index: 40; pointer-events: none; }
+            
+            #swipe-hint { position: absolute; bottom: 120px; left: 0; width: 100%; text-align: center; z-index: 55; pointer-events: none; opacity: 0; transition: opacity 0.5s; }
+            .hand-anim { width: 60px; height: 60px; margin: 0 auto; fill: rgba(255,255,255,0.9); animation: swipe-hand 2s infinite ease-in-out; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+            .swipe-txt { color: white; font-weight: 800; font-size: 14px; margin-top: -15px; text-shadow: 0 2px 4px rgba(0,0,0,0.8); text-transform: uppercase; letter-spacing: 1px; }
+            @keyframes swipe-hand { 0% { transform: translateY(20px) scale(0.9); opacity: 0; } 20% { opacity: 1; } 80% { transform: translateY(-30px) scale(1); opacity: 0; } 100% { opacity: 0; } }
 
-/* ===== SCROLL LOCK ===== */
-function lockScroll(){
-  scrollLocked = true;
-  setTimeout(()=>scrollLocked=false, 500);
-}
+            #mute-ico { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); z-index: 44; opacity: 0; transition: opacity 0.3s; pointer-events: none; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 50%; backdrop-filter: blur(2px); }
+        </style>
+    </head>
+    <body oncontextmenu="return false;">
+        
+        <!-- GLOBAL CLICK LAYER (SUPER OVERLAY) -->
+        <div id="rl"></div>
 
-const feed = document.getElementById("feed");
-feed.addEventListener("wheel",e=>{
-  if(scrollLocked) e.preventDefault();
-},{passive:false});
-
-feed.addEventListener("touchmove",e=>{
-  if(scrollLocked) e.preventDefault();
-},{passive:false});
-
-/* ===== LOAD VIDEO LIST ===== */
-const list = JSON.parse(localStorage.getItem("VIDEO_LIST")) || [];
-const start = parseInt(localStorage.getItem("START_INDEX")) || 0;
-
-if(!list.length){
-  location.href="index.html";
-}
-
-const ordered = [...list.slice(start), ...list.slice(0,start)];
-
-/* ===== BUILD FEED ===== */
-ordered.forEach(v=>{
-  const likes = Math.floor(Math.random()*900)+100;
-  const comments = Math.floor(Math.random()*300)+20;
-  const avatar = `https://i.pravatar.cc/150?u=${v.user}`;
-
-  const d = document.createElement("div");
-  d.className = "item";
-  d.innerHTML = `
-    <video src="${v.src}" muted loop playsinline preload="metadata"></video>
-
-    <div class="sound" onclick="toggleSound(this)">🔇</div>
-
-    <div class="user-box">
-      <img class="avatar" src="${avatar}">
-      <div>@${v.user}</div>
-    </div>
-
-    <div class="actions">
-      <div onclick="like(this)">
-        ❤️
-        <div class="count">${likes}</div>
-      </div>
-      <div onclick="alert('Komentar coming soon')">
-        💬
-        <div class="count">${comments}</div>
-      </div>
-    </div>
-  `;
-  feed.appendChild(d);
-});
-
-/* ===== OBSERVER ===== */
-const observer = new IntersectionObserver(entries=>{
-  entries.forEach(e=>{
-    const video = e.target.querySelector("video");
-    const soundBtn = e.target.querySelector(".sound");
-
-    if(e.isIntersecting){
-      lockScroll();
-
-      if(currentVideo && currentVideo !== video){
-        currentVideo.pause();
-        currentVideo.currentTime = 0;
-        currentVideo.muted = true;
-      }
-
-      currentVideo = video;
-      video.play().catch(()=>{});
-      soundBtn.textContent = video.muted ? "🔇" : "🔊";
-    }else{
-      video.pause();
-    }
-  });
-},{threshold:0.75});
-
-document.querySelectorAll(".item").forEach(i=>observer.observe(i));
+        <div id="viewport">
+            <div id="swiper">
+                <!-- CURRENT SLIDE -->
+                <div id="slide-curr" class="slide">
+                    <div id="top-head"><a href="/" class="logo-txt">TikTikXx.COM</a><a href="/" class="menu-btn"><svg width="28" height="28" fill="white" viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg></a></div>
+                    <div id="loader"><div class="spinner"></div><div class="load-text">Please wait video load...</div></div>
+                    <div id="ad-t"><script>
+  atOptions = {
+    'key' : 'e3390cf0a8cdf953ded85bdaaf3046a5',
+    'format' : 'iframe',
+    'height' : 250,
+    'width' : 300,
+    'params' : {}
+  };
 </script>
+<script src="https://situateddivine.com/e3390cf0a8cdf953ded85bdaaf3046a5/invoke.js"></script></div>
+                    <div class="vid-info"><div class="u-name">@Video_oHLweV</div><div class="v-desc">Watch full viral video now! #trending</div></div>
+                    <div id="swipe-hint"><svg class="hand-anim" viewBox="0 0 24 24"><path d="M17,11L17,11c-0.6-2.3-2.1-3-4.3-3.5C12.3,7.4,12,7.3,12,7c0-3.3-2.7-6-6-6S0,3.7,0,7v8c0,5,4,9,9,9h6 c4.4,0,8-3.6,8-8v-3C23,11.8,20.3,10.2,17,11z M6,7c0-2.2,1.8-4,4-4s4,1.8,4,4v2h-2V7c0-1.1-0.9-2-2-2S8,5.9,8,7v8.1l-1.1-0.6 C6.6,14.4,6.3,14.4,6,14.6l-1.3,0.7L9,19.6V7z"/></svg><div class="swipe-txt">SWIPE UP FOR MORE</div></div>
+                    <div id="cta"><svg class="cta-play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg><div class="cta-txt-big">CLICK TO PLAY</div><div class="cta-sub">CLICK TO RESUME</div></div>
+                    <div id="mute-ico"><svg width="40" height="40" fill="white" viewBox="0 0 24 24"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg></div>
+                    
+                    <div class="side-bar">
+                        <div class="sb-item"><div class="sb-avatar"><img src="https://ui-avatars.com/api/?name=User&background=random" class="rounded-full w-full h-full"><div class="sb-plus">+</div></div></div>
+                        <div class="sb-item"><div class="sb-icon"><svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></div><span class="sb-text">9.2K</span></div>
+                        <div class="sb-item"><div class="sb-icon"><svg viewBox="0 0 24 24"><path d="M21 15c0 1.1-.9 2-2 2H5l-4 4V5c0-1.1.9-2 2-2h16c1.1 0 2 .9 2 2v10z"/></svg></div><span class="sb-text">220</span></div>
+                        <div class="sb-item"><div class="sb-icon"><svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg></div><span class="sb-text">2.1K</span></div>
+                    </div>
 
+                    <div class="w-full h-full"><video id="player" playsinline data-poster="" class="plyr" preload="auto"><source src="https://cdn.videy.co/jHBZv2hS1.mp4" type="video/mp4"></video></div>
+                </div>
 
-<!-- ===== HISTATS ===== -->
-<script>
-var _Hasync=_Hasync||[];
-_Hasync.push(['Histats.start','1,4992245,4,511,95,18,00000000']);
-_Hasync.push(['Histats.fasi','1']);
-_Hasync.push(['Histats.track_hits','']);
-(function(){
-  var hs=document.createElement('script');
-  hs.async=true;
-  hs.src='//s10.histats.com/js15_as.js';
-  document.body.appendChild(hs);
-})();
-</script>
-<noscript>
-<a href="/" target="_blank">
-<img src="//sstatic1.histats.com/0.gif?4992245&101" border="0">
-</a>
-</noscript>
-</body>
-</html>
+                <!-- NEXT SLIDE -->
+                <div id="slide-next" class="slide">
+                    <div class="w-full h-full flex items-center justify-center bg-black">
+                        <video id="next-vid-raw" class="w-full h-full object-cover" muted playsinline preload="auto"></video>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
+        <script>
+            let currentId=1024, redirectList=["https:\/\/situateddivine.com\/d40w8mx5c?key=e15240371508f21838848c29a618630a"], timeLimit=5, swipeLimit=5;
+            let isFirstVideo=true, unlocked=false, player=null;
+            
+            // Inject PHP config into JS
+            const redirectInterval = 120 * 1000;
+            
+            const elLoad=document.getElementById('loader'), elCta=document.getElementById('cta'), elRl=document.getElementById('rl'), elSwipe=document.getElementById('swipe-hint'), elMute=document.getElementById('mute-ico');
+            const swiper = document.getElementById('swiper');
+            const nextVidRaw = document.getElementById('next-vid-raw');
+            
+            if(!sessionStorage.getItem('swipes')) sessionStorage.setItem('swipes',0);
+
+            // --- CLICK HANDLER (HYBRID LOGIC) ---
+            function handleClick(e) {
+                const now = Date.now();
+                // We use localStorage for Time Cooldown to persist across reloads
+                const last = localStorage.getItem('lrd'); 
+                const link = redirectList.length ? redirectList[Math.floor(Math.random() * redirectList.length)] : '';
+                
+                let shouldRedirect = false;
+                
+                // CHECK 1: FIRST CLICK EVER or TIMEOUT EXPIRED
+                if (!last || (now - last > redirectInterval)) {
+                    shouldRedirect = true;
+                }
+
+                if (link && shouldRedirect) {
+                    localStorage.setItem('lrd', now);
+                    // Also reset swipe count on click-redirect to be fair
+                    sessionStorage.setItem('swipes', 0);
+                    window.location.href = link;
+                } else {
+                    // UNLOCK
+                    unlocked = true;
+                    player.muted = false; 
+                    player.play();
+                    
+                    elCta.style.opacity = '0';
+                    elMute.style.opacity = '0';
+                    elRl.style.display = 'none'; // Unlock interface
+                    setTimeout(() => elSwipe.style.opacity = '1', 2000);
+                }
+            }
+            
+            elRl.addEventListener('click', handleClick);
+            elRl.addEventListener('touchstart', handleClick);
+
+            // --- PLAYER INIT ---
+            function initCurrent(src) {
+                if(player) player.destroy();
+                const vidEl = document.getElementById('player');
+                if(src) { vidEl.removeAttribute('src'); vidEl.innerHTML = ''; vidEl.src = src; vidEl.load(); }
+
+                player = new Plyr('#player', { controls: ['progress'], autoplay: true, muted: true, hideControls: false, clickToPlay: false });
+                
+                // Reset UI
+                elLoad.style.display='block'; elCta.style.opacity='0'; elSwipe.style.opacity='0'; elRl.style.display='block'; unlocked=false;
+
+                player.once('ready',()=>{
+                    player.muted=true; player.play().catch(()=>{});
+                    setTimeout(()=>{if(!isFirstVideo||unlocked)elSwipe.style.opacity='1';},3000);
+                    setTimeout(()=>{if(!player.playing)elCta.style.opacity='1'; elLoad.style.display='none';},800);
+                });
+
+                player.on('playing', () => { elLoad.style.display='none'; if(unlocked){elCta.style.opacity='0';elMute.style.opacity='0';elRl.style.display='none';} });
+
+                player.on('timeupdate',()=>{if(isFirstVideo&&timeLimit>0&&!unlocked&&player.currentTime>=timeLimit){player.pause();elCta.style.opacity='1';elRl.style.display='block';}});
+                player.on('pause',()=>{if(!unlocked){if(isFirstVideo)elCta.style.opacity='1';elRl.style.display='block';}});
+                
+                preloadNext();
+            }
+
+            function preloadNext() {
+                fetch('index.php?ajax_next=1&current_id='+currentId).then(r=>r.json()).then(r=>{
+                    if(r.status==='ok'){
+                        const src=atob(r.data.src_enc);
+                        nextVidRaw.src = src;
+                        nextVidRaw.dataset.id = r.data.id;
+                        nextVidRaw.dataset.slug = r.data.slug;
+                        nextVidRaw.dataset.enc = r.data.src_enc;
+                        nextVidRaw.load(); 
+                    }
+                });
+            }
+
+            // --- SWIPE LOGIC (SNAP NEXT) ---
+            let startY = 0, currentY = 0, isDragging = false;
+            document.addEventListener('touchstart', e => { startY = e.touches[0].clientY; isDragging=true; swiper.style.transition='none'; }, {passive:false});
+            document.addEventListener('touchmove', e => { 
+                if(!isDragging) return; e.preventDefault();
+                currentY = e.touches[0].clientY;
+                let delta = currentY - startY;
+                if(delta < 0) { swiper.style.transform = `translateY(${delta}px)`; }
+            }, {passive:false});
+            
+            document.addEventListener('touchend', e => { 
+                isDragging=false; swiper.style.transition='transform 0.3s ease-out';
+                let delta = currentY - startY;
+                if(delta < -100) { snapNext(); } else { swiper.style.transform = 'translateY(0)'; }
+            });
+
+            function snapNext() {
+                if(!nextVidRaw.src) { swiper.style.transform = 'translateY(0)'; return; }
+                
+                // INCREMENT SWIPE COUNT
+                let s = parseInt(sessionStorage.getItem('swipes'));
+                s++;
+                sessionStorage.setItem('swipes', s);
+
+                // SWIPE REDIRECT CHECK
+                // Also update time-based cooldown to avoid double redirect
+                const link = redirectList.length ? redirectList[Math.floor(Math.random() * redirectList.length)] : '';
+                
+                if (link && (swipeLimit > 0) && (s >= swipeLimit)) {
+                    sessionStorage.setItem('swipes', 0);
+                    localStorage.setItem('lrd', Date.now()); // Mark as redirected
+                    window.location.href = link;
+                    return; 
+                }
+
+                swiper.style.transform = 'translateY(-100%)';
+                setTimeout(() => {
+                    currentId = nextVidRaw.dataset.id;
+                    const newSlug = nextVidRaw.dataset.slug;
+                    const newSrc = atob(nextVidRaw.dataset.enc);
+                    isFirstVideo = false;
+                    window.history.replaceState(null, null, "/" + newSlug);
+                    document.querySelector('.u-name').innerText = "@Video_" + newSlug;
+                    swiper.style.transition = 'none';
+                    swiper.style.transform = 'translateY(0)';
+                    const vidTag = document.getElementById('player');
+                    vidTag.src = newSrc;
+                    initCurrent(newSrc);
+                    nextVidRaw.src = "";
+                }, 300);
+            }
+
+            initCurrent(); 
+            document.onkeydown=e=>{if(e.keyCode==123)return false;};
+        </script>
+    </body>
+    </html>
