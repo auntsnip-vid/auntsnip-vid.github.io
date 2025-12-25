@@ -1,240 +1,224 @@
-
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
+<meta name="referrer" content="no-referrer-when-downgrade" />
 <meta charset="UTF-8">
-<meta name="viewport"
-content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Playback</title>
-
-<link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css">
 
 <style>
 html,body{
   margin:0;
-  width:100%;
   height:100%;
   background:#000;
   overflow:hidden;
-  touch-action:none;
+  font-family:sans-serif;
+  color:#fff;
 }
-#viewport,#swiper,.slide{
-  width:100%;
-  height:100%;
-}
-#swiper{
-  position:relative;
-}
-.slide{
+#ad-b{
+  display:auto;          /* awalnya HIDDEN */
   position:absolute;
-  top:0;left:0;
+  width:100%;
+  z-index:40;
+  pointer-events:auto;
 }
-#next{top:100%}
+#ad-t{
+  display:auto;
+  position:absolute;
+  top:60px;
+  width:100%;
+  z-index:999;       /* 🔥 WAJIB tinggi */
+  pointer-events:auto;
+}
+#ad-b{ bottom:85px }
+#viewport{
+  position:relative;
+  height:100vh;
+  width:100%;
+}
 video{
   width:100%;
   height:100%;
   object-fit:cover;
 }
-#loader{
+.overlay{
   position:absolute;
-  inset:0;
+  bottom:90px;
+  left:14px;
+}
+.user{font-weight:bold;margin-bottom:6px}
+.caption{font-size:14px}
+.right{
+  position:absolute;
+  right:12px;
+  bottom:110px;
   display:flex;
+  flex-direction:column;
   align-items:center;
-  justify-content:center;
-  z-index:20;
+  gap:16px;
 }
-.spinner{
-  width:48px;height:48px;
-  border:5px solid rgba(255,255,255,.2);
-  border-left-color:#fe2c55;
+.right img{
+  width:46px;
+  height:46px;
   border-radius:50%;
-  animation:spin .8s linear infinite;
+  border:2px solid #fff;
 }
-            .vid-info { position: absolute; bottom: 40px; left: 10px; z-index: 45; color: white; width: 75%; pointer-events: none; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); text-align: left; }
-            .u-name { font-weight: 700; font-size: 17px; margin-bottom: 5px; }
-            .v-desc { font-size: 14px; line-height: 1.3; opacity: 0.9; margin-bottom: 8px; }
-            
-            #loader { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); z-index: 60; text-align: center; width: 100%; pointer-events: none; }
-            .spinner{ margin: 0 auto 10px auto; width: 50px; height: 50px; border: 5px solid rgba(255,255,255,0.2); border-left-color: #fe2c55; border-radius: 50%; animation: spin 0.8s linear infinite; }
-            .load-text { color: white; font-size: 14px; font-weight: 600; text-shadow: 0 2px 4px rgba(0,0,0,0.8); animation: pulse 1.5s infinite; }
-            @keyframes spin { to { transform: rotate(360deg); } } @keyframes pulse { 0% { opacity:0.6; } 50% { opacity:1; } 100% { opacity:0.6; } }
-            
-            #cta { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); z-index: 46; text-align: center; width: 80%; pointer-events: none; opacity: 0; transition: opacity 0.3s; }
-            .cta-play-icon { width: 80px; height: 80px; margin: 0 auto 10px auto; fill: rgba(255,255,255,0.9); filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5)); animation: pulse-scale 2s infinite; }
-            .cta-txt-big { font-size: 24px; font-weight: 900; color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,0.8); text-transform: uppercase; }
-            .cta-sub { font-size: 14px; color: #eee; font-weight: 600; margin-top: 5px; }
-            @keyframes pulse-scale { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
-            
-            #ad-t { position: absolute; top: 60px; width: 100%; z-index: 40; pointer-events: auto; }
-            #ad-b { position: absolute; bottom: 85px; width: 100%; z-index: 40; pointer-events: auto; }
-            
-            #swipe-hint { position: absolute; bottom: 120px; left: 0; width: 100%; text-align: center; z-index: 55; pointer-events: none; opacity: 0; transition: opacity 0.5s; }
-            .hand-anim { width: 60px; height: 60px; margin: 0 auto; fill: rgba(255,255,255,0.9); animation: swipe-hand 2s infinite ease-in-out; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
-            .swipe-txt { color: white; font-weight: 800; font-size: 14px; margin-top: -15px; text-shadow: 0 2px 4px rgba(0,0,0,0.8); text-transform: uppercase; letter-spacing: 1px; }
-            @keyframes swipe-hand { 0% { transform: translateY(20px) scale(0.9); opacity: 0; } 20% { opacity: 1; } 80% { transform: translateY(-30px) scale(1); opacity: 0; } 100% { opacity: 0; } }
-
-            #mute-ico { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); z-index: 44; opacity: 0; transition: opacity 0.3s; pointer-events: none; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 50%; backdrop-filter: blur(2px); }
-
-.profile{
+.icon{text-align:center;font-size:13px}
+.swipe{
   position:absolute;
   bottom:24px;
-  left:12px;
-  display:flex;
-  align-items:center;
-  gap:10px;
-  z-index:10;
-  color:#fff;
+  width:100%;
+  text-align:center;
+  opacity:.8;
 }
-.avatar{
-  width:42px;height:42px;
-  border-radius:50%;
-  background:#444;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight:bold;
-}
-.username{font-weight:bold}
 </style>
 </head>
 
 <body>
+<div id="ad-t">
+<script src="pupunder.js"></script>
+</div>
 
 <div id="viewport">
-  <div id="swiper">
+  <video id="video" playsinline autoplay muted></video>
 
-    <div id="current" class="slide">
-      <div class="profile">
-        <div class="avatar" id="avatar">U</div>
-        <div class="username" id="uname">@user</div>
-      </div>
-      <div id="loader"><div class="spinner"></div></div>
-    </div>
-<div id="ad-t">
-
-</div>
-<div id="ad-b">
-<script type="text/javascript">
-  atOptions = {
-  	'key' : '51c1b727b1fb24c84262ba58d158f230',
-  	'format' : 'iframe',
-  	'height' : 250,
-  	'width' : 300,
-  	'params' : {}
-  };
-</script>
-<script
-  type="text/javascript"
-  src="https://pricecardboardtractor.com/51c1b727b1fb24c84262ba58d158f230/invoke.js"
-></script></div>
-    <div id="next" class="slide"></div>
-
+  <div class="overlay">
+    <div class="user" id="user">@username</div>
+    <div class="caption" id="caption">🔥 Viral video</div>
   </div>
+
+  <div class="right">
+    <img id="avatar">
+    <div class="icon">❤️<span id="like">12K</span></div>
+    <div class="icon">💬<span id="comment">321</span></div>
+  </div>
+
+  <div class="swipe">⬆ Swipe up for next video</div>
 </div>
 
-<script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
 <script>
-const LIST = JSON.parse(localStorage.getItem("VIDEO_LIST")||"[]");
-let index = Number(localStorage.getItem("START_INDEX")||0);
+const videos = JSON.parse(localStorage.getItem("VIDEO_LIST") || "[]");
+let index = parseInt(localStorage.getItem("START_INDEX") || 0);
 
-const swiper = document.getElementById("swiper");
-const current = document.getElementById("current");
-const next = document.getElementById("next");
-const loader = document.getElementById("loader");
-const uname = document.getElementById("uname");
+/* ELEMENT */
+const video = document.getElementById("video");
+const user = document.getElementById("user");
 const avatar = document.getElementById("avatar");
+const like = document.getElementById("like");
+const comment = document.getElementById("comment");
+const caption = document.getElementById("caption");
 
-let plyr=null;
-let locked=false;
+const adTop = document.getElementById("ad-t");
+const adBottom = document.getElementById("ad-b");
 
-/* ===== UTIL ===== */
-function setURL(user){
-  history.replaceState({},'',`?v=${encodeURIComponent(user)}`);
+/* RANDOM */
+const captions=[
+  "no words, just ice spice.😍💦",
+  "the eyes were on him—yet he grinned straight into the lens 👀🙈",
+  "Fix bikin nagih",
+  "Auto replay 😍"
+];
+function rand(a,b){return Math.floor(Math.random()*(b-a))+a}
+
+/* ===== IKLAN CONTROL ===== */
+let swipeCount = 0;
+let lastSwipeTime = 0;
+let adTimer = null;
+let allowAds = false;
+
+/* tampilkan iklan dengan delay pintar */
+function showAdsSmart(){
+  if(!allowAds) return;
+
+  clearTimeout(adTimer);
+  adTimer = setTimeout(()=>{
+    adTop.style.display="auto";
+    adBottom.style.display="auto";
+  }, 2500); // ⏱️ delay aman 2.5 detik
 }
 
-function avatarText(user){
-  return user ? user.replace('@','')[0].toUpperCase() : 'U';
+/* sembunyikan iklan */
+function hideAds(){
+  /* social bar JANGAN di-hide */
+  adBottom.style.display="auto";
 }
 
-function createVideo(src){
-  const v=document.createElement('video');
-  v.src=src;
-  v.autoplay=true;
-  v.muted=true;
-  v.playsInline=true;
-  v.preload='auto';
-  return v;
+/* ===== LOAD VIDEO ===== */
+function loadVideo(i){
+  const v = videos[i];
+  if(!v) return;
+
+  video.src = v.src;
+  video.play();
+
+  user.innerText = v.user;
+  avatar.src = "https://i.pravatar.cc/150?img="+rand(1,70);
+  like.innerText = rand(1,99)+"K";
+  comment.innerText = rand(10,999);
+  caption.innerText = captions[rand(0,captions.length)];
+
+  history.replaceState({}, "", "playback.html?vid="+v.user.replace("@",""));
+
+  swipeCount++;
+
+function showAdsSmart(){
+  if(!allowAds) return;
+
+  clearTimeout(adTimer);
+  adTimer = setTimeout(()=>{
+    /* social bar tampil SEKALI */
+    if(adTop.style.display!=="auto"){
+      adTop.style.display="auto";
+    }
+
+    /* iframe iklan aman */
+    adBottom.style.display="auto";
+  }, 2500);
+}
 }
 
-/* ===== LOAD ===== */
-function load(){
-  loader.style.display='flex';
-  current.querySelector('video')?.remove();
+/* ===== TAP UNMUTE + AKTIFKAN IKLAN ===== */
+document.body.addEventListener("click",()=>{
+  video.muted=false;
+  video.play();
+  allowAds = true; // ✅ user interaction nyata
+},{once:true});
 
-  const data = LIST[index];
-  if(!data) return;
-
-  uname.textContent=data.user||'@video';
-  avatar.textContent=avatarText(data.user);
-  setURL(data.user||'video');
-
-  const v=createVideo(data.src);
-  current.appendChild(v);
-
-  plyr=new Plyr(v,{
-    autoplay:true,
-    muted:true,
-    controls:['progress'],
-    clickToPlay:false
-  });
-
-  v.onplaying=()=>loader.style.display='none';
-  preloadNext();
-}
-
-function preloadNext(){
-  next.innerHTML='';
-  if(!LIST[index+1]) return;
-  const v=createVideo(LIST[index+1].src);
-  v.pause();
-  next.appendChild(v);
-}
-
-/* ===== SWIPE ===== */
+/* ===== SWIPE DETECT ===== */
 let startY=0;
+document.addEventListener("touchstart",e=>{
+  startY = e.touches[0].clientY;
+});
 
-document.addEventListener('touchstart',e=>{
-  if(locked) return;
-  startY=e.touches[0].clientY;
-},{passive:true});
+document.addEventListener("touchend",e=>{
+  const endY = e.changedTouches[0].clientY;
+  const now = Date.now();
+  const swipeSpeed = now - lastSwipeTime;
+  lastSwipeTime = now;
 
-document.addEventListener('touchend',e=>{
-  if(locked) return;
-  const diff=startY-e.changedTouches[0].clientY;
-  if(diff>120) swipeNext();
-},{passive:true});
+  /* kalau swipe cepat → hide iklan */
+  if(swipeSpeed < 500){
+    hideAds();
+  }
 
-function swipeNext(){
-  if(!LIST[index+1]) return;
-  locked=true;
+  if(startY-endY>60){
+    index=(index+1)%videos.length;
+    loadVideo(index);
+  }
+  if(endY-startY>60){
+    index=(index-1+videos.length)%videos.length;
+    loadVideo(index);
+  }
+});
 
-  swiper.style.transition='transform .35s ease';
-  swiper.style.transform='translateY(-100%)';
-
-  setTimeout(()=>{
-    plyr.destroy();
-    index++;
-    localStorage.setItem('START_INDEX',index);
-    swiper.style.transition='none';
-    swiper.style.transform='translateY(0)';
-    load();
-    locked=false;
-  },350);
+/* ===== START ===== */
+if(videos.length){
+  loadVideo(index);
+}else{
+  alert("VIDEO_LIST kosong, buka dari index.html");
 }
-
-load();
 </script>
+
 
 </body>
 </html>
